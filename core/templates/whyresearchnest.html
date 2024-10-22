@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+{% include 'navbar.html' %}
+<div class="bradcam_area bradcam_bg_1">
+    <div class="container">
+        <div class="row">
+            <div class="col-xl-12">
+                <div class="bradcam_text text-center text-white">
+                    <h2>ResearchNest</h2>
+                    <p>"Share your work with confidence in a protected environment."</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container py-5">
+    <h2 class="text-center">Why Choose ResearchNest?</h2>
+    <!-- <p class="mx-5 px-3">In today's fast-paced academic world, researchers face the challenge of managing vast amounts of data, collaborating with colleagues, and securely sharing their findings—all while ensuring their research integrity remains uncompromised. ResearchNest is designed to be the ultimate solution to these challenges.</p> -->
+    <p class="mx-5 px-3 my-4">In today's fast-paced academic world, researchers face a multitude of challenges that can hinder their productivity and the integrity of their work. The sheer volume of data generated during research can be overwhelming, requiring sophisticated tools to organize, store, and analyze information efficiently. Traditional methods of data management often fall short, leading to potential data loss, duplication, and difficulty in accessing vital information when needed.</p>
+    <p class="mx-5 px-3 my-4">&emsp;&emsp;&emsp;ResearchNest is designed to be the ultimate solution to these challenges, providing researchers with a robust platform that addresses every aspect of modern academic work. By offering advanced data management tools, seamless collaboration features, and top-tier security protocols, ResearchNest empowers researchers to focus on their core work—advancing knowledge—while the platform takes care of the complexities. Whether you're managing large datasets, working with a global team, or ensuring your research remains secure and ethically sound, ResearchNest is your trusted partner in achieving academic excellence.</p>
+    <div class="row mx-5 px-3 keyfeatures">
+        <h2 class="text-center my-5">Key Features</h2>
+        <div class="col-md-4">
+            <div class="card shadow-lg">
+                <img src="{% static 'imgs/keyfeatures/do1.jpg' %}" alt="" srcset="" class="img-fluid">
+                <div class="card-body">
+                    <h5 class="card-title">Efficient Project Organization</h5>
+                    <p class="card-text">ResearchNest allows you to create detailed project plans, assign tasks, and set milestones, all within a single, user-friendly interface.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 keyfeaturespd">
+            <div class="card shadow-lg">
+                <img src="{% static 'imgs/keyfeatures/sd1.jpg' %}" alt="" srcset="" class="img-fluid">
+                <div class="card-body">
+                    <h5 class="card-title">Secure Data Management</h5>
+                    <p class="card-text">ResearchNest offers state-of-the-art security features to protect your data from unauthorized access, ensuring it remains confidential and secure.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 keyfeaturespd">
+            <div class="card shadow-lg">
+                <img src="{% static 'imgs/keyfeatures/ds1.jpg' %}" alt="" srcset="" class="img-fluid">
+                <div class="card-body">
+                    <h5 class="card-title">Flexible Data Sharing</h5>
+                    <p class="card-text">Whether your research is meant for a select group or the broader academic community, ResearchNest provides flexible sharing options.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% include 'footer.html' %}
+{% endblock %}

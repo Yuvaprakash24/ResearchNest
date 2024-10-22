@@ -1,0 +1,217 @@
+@import url('https://fonts.googleapis.com/css2?family=Dancing+Script&family=Nothing+You+Could+Do&family=Peralta&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@100..900&display=swap');
+/* footer .btn.btn-outline-light .allwhite:hover {
+    background-color: transparent;
+    color: white;
+} */
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.hower_items .card {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hower_items .card:hover{
+    transform: scale(1.05); 
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+footer a{
+    text-decoration: none;
+    color: white;
+}
+footer a:hover{
+    text-decoration: underline;
+    color: white;
+}
+
+.myff{
+    font-family: "Nothing You Could Do", cursive;
+    font-weight: 400;
+    font-size: 300%;
+    color: #000;
+    margin-bottom: 2%;
+}
+
+.form-inputs{
+    position:relative;
+}
+.form-inputs .form-control{
+    height:45px; 
+}
+
+.form-inputs .form-control:focus{
+    box-shadow:none;
+    border:1px solid #000;
+}
+
+.form-inputs i{
+    position:absolute;
+    right:10px;
+    top:15px;
+}
+.fixy{
+    position: sticky; bottom: 2%; left: 92%; z-index: 1000;
+}
+
+.loginpic{
+    background-size: 100% 100%;
+    height: 400px;
+}
+
+@media (max-width: 766px) {
+    .myff{
+        font-weight: 100;
+        font-size: 175%;
+    }
+  }
+
+@media (max-width: 426px) {
+    .loginpic{
+        height: 300px;
+    }
+    .keyfeaturespd{
+        padding-top: 3%;
+    }
+}
+
+.segmented-control {
+    display: inline-flex;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.segmented-control .btn {
+    border: none;
+    border-right: 1px solid #ced4da;
+    background-color: #f8f9fa;
+    color: #6c757d;
+    font-weight: bold;
+}
+
+.segmented-control .btn:last-child {
+    border-right: none;
+}
+
+.segmented-control .btn.active {
+    background-color: #e9ecef;
+    color: #212529;
+}
+
+.filter-input {
+    max-width: 300px;
+}
+
+.btn-group .btn {
+    background-color: white; 
+    color: black; 
+  }
+  
+  .btn-group .btn.active {
+    background-color: #000; 
+    color: white;
+    font-weight: bold;
+  }
+  
+  .btn-group .btn:hover{
+    background-color: #000;
+    color: white;
+  }
+
+  .profile p strong{
+    color: #7A838B;
+  }
+
+  .bradcam_area::before {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: #040E27;
+    opacity: .1;
+    z-index: -1;
+    content: '';
+}
+
+.bradcam_area {
+    background-size: cover;
+    background-position: center center;
+    padding: 175px 0;
+    background-repeat: no-repeat;
+    position: relative;
+    z-index: 0;
+}
+
+.bradcam_bg_1{
+    background-image: url(../imgs/Sign/banner.jpg)
+}
+
+.keyfeatures .card:hover{
+    background-color: #45526e;
+    color: #fff;
+}
+
+.robot-slab{
+    font-family: Roboto Slab;
+    font-weight: 400;
+}
+
+.contact-info-item {
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+}
+.contact-info-item img {
+    margin-right: 15px;
+}
+
+/* .client-story {
+    margin-bottom: 30px;
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.client-story img {
+    border-radius: 50%;
+    margin-right: 15px;
+}
+.client-story .client-info {
+    display: flex;
+    align-items: center;
+}
+.client-story .client-info h5 {
+    margin-bottom: 0;
+}
+.client-story .client-info small {
+    color: #6c757d;
+} */
+
+.client-story {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+.client-story img {
+    border-radius: 50%;
+    margin-bottom: 15px;
+}
+.client-story h5 {
+    margin-bottom: 5px;
+}
+.carousel-indicators [data-bs-target] {
+    background-color: #6c757d;
+}
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+    background-color: #6c757d;
+    border-radius: 50%;
+}

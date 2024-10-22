@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+{% load static %}
+<!-- Section: Design Block -->
+{% block content %}
+<section class="text-center">
+    <!-- Background image -->
+    <div class="p-5 bg-image loginpic" style="background-image: url('{% static 'imgs/Sign/banner.jpg' %}');"></div>
+    <!-- Background image -->
+  
+    <div class="card mx-4 mx-md-5 shadow-5-strong bg-body-tertiary" style="
+          margin-top: -100px;
+          backdrop-filter: blur(30px);
+          ">
+      <div class="card-body py-5 px-md-5">
+        <div class="row d-flex justify-content-center">
+          <div class="col-lg-8">
+            <h2 class="fw-bold mb-5 myff">Sign up now</h2>
+            <form action="signup" method="post">
+              {% csrf_token %}
+              <div data-mdb-input-init class="form-outline mb-4">
+                <input type="text" id="form3Example2" name="username" class="form-control" />
+                <label class="form-label h5" for="form3Example2">Username</label>
+                {% for error in form.username.errors %}
+                  <p class="text-danger">{{ error }}</p>
+                {% endfor %}
+              </div>
+              <!-- 2 column grid layout with text inputs for the first and last names -->
+              <div class="row">
+                <div class="col-md-6 mb-4">
+                  <div data-mdb-input-init class="form-outline">
+                    <input type="text" id="form3Example1" name="first_name" class="form-control" />
+                    <label class="form-label h5" for="form3Example1">First name</label>
+                  </div>
+                </div>
+                <div class="col-md-6 mb-4">
+                  <div data-mdb-input-init class="form-outline">
+                    <input type="text" id="form3Example2" name="last_name" class="form-control" />
+                    <label class="form-label h5" for="form3Example2">Last name</label>
+                  </div>
+                </div>
+              </div>
+  
+
+              <!-- Email input -->
+              <div data-mdb-input-init class="form-outline mb-4">
+                <input type="email" id="form3Example3" name="email" class="form-control" />
+                <label class="form-label h5" for="form3Example3">Email address</label>
+                {% for error in form.email.errors %}
+                  <p class="text-danger">{{ error }}</p>
+                {% endfor %}
+              </div>
+
+              <div data-mdb-input-init class="form-outline mb-4">
+                <select id="fieldOfStudy" name="field_of_study" class="form-control" onchange="toggleOtherField(this)">
+                    <option value="" disabled selected>Select your field of study</option>
+                    <option value="biology">Biology</option>
+                    <option value="chemistry">Chemistry</option>
+                    <option value="physics">Physics</option>
+                    <option value="computer_science">Computer Science</option>
+                    <option value="psychology">Psychology</option>
+                    <option value="other">Other (Please specify)</option>
+                </select>
+                <label class="form-label h5" for="fieldOfStudy">Field of Study</label>
+            </div>
+            
+            <!-- Text input for 'Other' field -->
+            <div data-mdb-input-init class="form-outline mb-4" id="otherFieldDiv" style="display: none;">
+                <input type="text" id="otherFieldOfStudy" name="other_field_of_study" class="form-control" />
+                <label class="form-label h5" for="otherFieldOfStudy">Please specify your field of study</label>
+            </div>
+
+              <!-- Password input -->
+              <div data-mdb-input-init class="form-outline mb-4">
+                <input type="password" id="form3Example4" name="password1" class="form-control" />
+                <label class="form-label h5" for="form3Example4">Password</label>
+                {% for error in form.password1.errors %}
+                    <p class="text-danger">{{ error }}</p>
+                {% endfor %}
+              </div>
+
+              <div data-mdb-input-init class="form-outline mb-4">
+                <input type="password" id="form3Example5" name="password2" class="form-control" />
+                <label class="form-label h5" for="form3Example5">Confirm Password</label>
+                {% for error in form.password2.errors %}
+                    <p class="text-danger">{{ error }}</p>
+                {% endfor %}
+              </div>
+  
+              <!-- Submit button -->
+              <button type="submit" data-mdb-button-init data-mdb-ripple-init class="btn btn-primary btn-lg btn-block mb-5 form-control">
+                Sign up
+              </button>
+
+              <p class="small fw-bold text-center">Have an account already? <a href="{% url 'login' %}"
+                class="link-danger">Log in</a></p>
+
+              <!-- Social Links -->
+              <div class="text-center">
+                <h3>Follow Us On</h3>
+                <a target="_blank" href="https://github.com/Yuvaprakash24" type="button" data-mdb-button-init data-mdb-ripple-init class="btn btn-outline-dark btn-floating mx-1">
+                    <i class="fab fa-github"></i>
+                </a>
+  
+                <a target="_blank" type="button" data-mdb-button-init data-mdb-ripple-init class="btn btn-outline-primary btn-floating mx-1">
+                  <i class="fab fa-linkedin-in"></i>
+                </a>
+  
+                <a target="_blank" type="button" data-mdb-button-init data-mdb-ripple-init class="btn btn-outline-dark btn-floating mx-1">
+                  <i class="fab fa-x-twitter"></i>
+                </a>
+
+                <a target="_blank" type="button" data-mdb-button-init data-mdb-ripple-init class="btn btn-outline-danger btn-floating mx-1">
+                    <i class="fab fa-instagram"></i>
+                </a>
+  
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- Section: Design Block -->
+
+  <script>
+    function toggleOtherField(select) {
+        var otherFieldDiv = document.getElementById('otherFieldDiv');
+        if (select.value === 'other') {
+            otherFieldDiv.style.display = 'block';
+        } else {
+            otherFieldDiv.style.display = 'none';
+        }
+    }
+</script>
+{% endblock %}

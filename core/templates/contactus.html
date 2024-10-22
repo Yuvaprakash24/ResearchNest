@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+{% include 'navbar.html' %}
+<div class="container my-5">
+    <h2>Get in Touch</h2>
+    <p>If you have any questions or need help, please fill out the form below. We do our best to respond within 1 business day.</p>
+    <div class="row mt-2">
+        <div class="col-md-8">
+            <form>
+                <div class="mb-3">
+                    <label for="fullName" class="form-label">Full Name</label>
+                    <input type="text" class="form-control" id="fullName" placeholder="Enter your full name...">
+                </div>
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email address</label>
+                    <input type="email" class="form-control" id="email" placeholder="Enter your email address...">
+                </div>
+                <div class="mb-3">
+                    <label for="subject" class="form-label">Subject</label>
+                    <input type="text" class="form-control" id="subject" placeholder="Enter a subject...">
+                </div>
+                <div class="mb-3">
+                    <label for="category" class="form-label">Category</label>
+                    <select class="form-select" id="category">
+                        <option selected>Select a category...</option>
+                        <option value="1">General Inquiry</option>
+                        <option value="2">Support</option>
+                        <option value="3">Feedback</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="message" class="form-label">Message</label>
+                    <textarea class="form-control" id="message" rows="5" placeholder="Enter your message..."></textarea>
+                    <div class="form-text">Message has to be minimum 40 characters.</div>
+                </div>
+                <button type="submit" class="btn btn-dark">Send Message</button>
+            </form>
+
+            <div class="mt-3">
+                <small>Protected by hCaptcha (<a href="#">Privacy Policy</a> - <a href="#">Terms of Service</a>)</small>
+            </div>
+        </div>
+        <!-- <div class="col-md-1"></div> -->
+        <div class="col-md-4 mt-4">
+            <div class="container rounded">
+                <div id="map" style="height: 290px; position: relative; overflow: hidden;"> 
+                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d243647.25176871577!2d78.40804555!3d17.4123487!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bcb99daeaebd2c7%3A0xae93b78392bafbc2!2sHyderabad%2C%20Telangana!5e0!3m2!1sen!2sin!4v1720530015254!5m2!1sen!2sin" width="100%" height="250" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                </div>
+            </div>
+            <div class="container d-flex justify-content-center align-items-center">
+                <div class="contact-info">
+                    <div class="contact-info-item">
+                        <img src="https://img.icons8.com/ios-filled/50/000000/home.png" alt="home" width="25" height="25">
+                        <div>
+                            <strong>Boduupal, Hyderabad.</strong><br>
+                            Telangana, India 500092
+                        </div>
+                    </div>
+                    <div class="contact-info-item">
+                        <img src="https://img.icons8.com/ios-filled/50/000000/phone.png" alt="phone" width="25" height="25">
+                        <div>
+                            <strong>+91 944 035 6328</strong><br>
+                            Mon to Fri 9am to 6pm
+                        </div>
+                    </div>
+                    <div class="contact-info-item">
+                        <img src="https://img.icons8.com/?size=100&id=12623&format=png&color=000000" alt="email" width="25" height="25">
+                        <div>
+                            <strong>yuvaprakashsai@gmail.com</strong><br>
+                            Send us your query anytime!
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% include 'simplefooter.html' %}
+{% endblock %}

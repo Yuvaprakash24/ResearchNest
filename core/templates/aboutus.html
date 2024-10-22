@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+{% include 'navbar.html' %}
+<!-- <div class="bradcam_area bradcam_bg_1">
+    <div class="container">
+        <div class="row">
+            <div class="col-xl-12">
+                <div class="bradcam_text text-center text-white">
+                    <h1>About Us</h1>
+                    <p>"Our mission is to empower researchers with a secure, user-friendly platform for managing and sharing academic data."</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> -->
+<div class="container" style="background-color: #fff;">
+    <div class="container p-5 text-center">
+        <img class="pt-5 img-fluid" src="{% static 'imgs/logo/logo.png' %}" width="20%" alt="">
+        <!-- <h1 class="myff pt-1">Empowering the world to develop technology <strong>through collective knowledge.</strong></h1> -->
+        <h1 class="robot-slab py-2 mx-2 text-black">Empowering the world to develop technology <strong>through collective knowledge</strong>.</h1>
+    </div>
+    <hr class="divider">
+    <div class="container py-5">
+        <div class="row">
+            <h3>Welcome to ResearchNest</h3>
+            <p class="px-5 py-1">At ResearchNest, we are committed to providing a secure, user-friendly platform that helps researchers manage and share their academic data with confidence. Whether you're handling large datasets or collaborating with a global team, we are here to make your research process seamless and efficient.</p>
+        </div>
+        <div class="row mt-3">
+            <h3>Our Story</h3>
+            <p class="px-5 py-1">Founded in 2024, ResearchNest was born out of a deep understanding of the challenges faced by researchers. Our team, comprised of experts in both academia and technology, has worked tirelessly to create a platform that addresses the unique needs of the research community, ensuring data security and ease of use.</p>
+        </div>
+        <div class="row mt-3">
+            <h3>Our Mission</h3>
+            <p class="px-5 py-1">Our mission is to empower researchers to focus on what they do best—advancing knowledge. We believe that by providing a secure environment, intuitive tools, and reliable support, ResearchNest can help researchers navigate the complexities of data management and collaboration, ultimately driving innovation and discovery.</p>
+        </div>
+        <div class="row mt-3">
+            <h3>Get Started Today</h3>
+            <p class="px-5 py-1">Are you ready to take your research to the next level? Join thousands of researchers who trust ResearchNest for their data management needs. <a href="{% url 'signup' %}">SignUp</a> today and start your journey toward more efficient, secure, and collaborative research.</p>
+        </div>
+        <div class="row mt-3">
+            <h3>Contact Us</h3>
+            <p class="px-5 py-1">Have questions or need support? We're here to help. Reach out to our dedicated support team at <a href="mailto:support@researchnest.com">support@researchnest.com</a>, or explore our <a href="#">Help Center</a> for more information.</p>
+        </div>
+    </div>
+</div>
+{% include 'footer.html' %}
+{% endblock %}

@@ -1,0 +1,277 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<nav class="navbar navbar-dark bg-dark sticky-top">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="{% url 'home' %}"><img src="{% static 'imgs/logo/2ch.png' %}" width="150%" alt="" srcset=""></a>
+    <div>
+      {% if user.is_authenticated %}
+      <a class="text-white me-3" style="text-decoration: none;">Hello, {{ user.username }}</a>
+      {% else %}
+      <a href="{% url 'login' %}?next={{ request.path }}" class="btn btn-success me-2">Login/Register</a>
+      {% endif %}
+      <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasDarkNavbar" aria-controls="offcanvasDarkNavbar">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+    </div>
+    <div class="offcanvas offcanvas-end text-bg-dark" tabindex="-1" id="offcanvasDarkNavbar" aria-labelledby="offcanvasDarkNavbarLabel">
+      <div class="offcanvas-header">
+        <!-- <h5 class="offcanvas-title" id="offcanvasDarkNavbarLabel">Dark offcanvas</h5> -->
+         <img src="{% static 'imgs/logo/2ch.png' %}">
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+      </div>
+      <div class="offcanvas-body">
+        <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
+          <li class="nav-item">
+            <a class="nav-link" aria-current="page" href="{% url 'home' %}">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'tags' %}">Tags</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'createproject' %}">Create Project</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'allpublicprojects' %}">Public Projects</a>
+          </li>
+          {% if user.is_authenticated %}
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              My Projects
+            </a>
+            <ul class="dropdown-menu dropdown-menu-dark">
+              <li><a class="dropdown-item" href="{% url 'allprojects' %}">All</a></li>
+              <li>
+                <hr class="dropdown-divider">
+              </li>
+              <li><a class="dropdown-item" href="{% url 'userpublicprojects' %}">Public</a></li>
+              <li><a class="dropdown-item" href="{% url 'userprotectedprojects' %}">Protected</a></li>
+              <li><a class="dropdown-item" href="{% url 'userprivateprojects' %}">Private</a></li>
+            </ul>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'profile' %}">My Profile</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'todolist' %}">Project Planner</a>
+          </li>
+          {% endif %}
+          <li>
+            <hr class="divider">
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'whyresearchnest' %}">Why ResearchNest</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'aboutus' %}">About Us</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'clientstories' %}">Client stories</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'contactus' %}">Contact Us</a>
+          </li>
+          {% if user.is_authenticated %}
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+          </li>
+          {% endif %}
+        </ul>
+      </div>
+    </div>
+  </div>
+</nav>
+    <div class="container">
+        <p class="myff text-center pt-3">Welcome to ResearchNest ! </p>
+        <div class="grid">
+            <div class="row">
+                <div class="col-md-3"></div>
+                <div class="col-md-6">
+                  <form class="d-flex form-inputs pb-5" method="GET" action="{% url 'search' %}">
+                      <div style="position: relative; width: 100%;">
+                          <input class="form-control" type="text" name="q" placeholder="Search any research details..." aria-label="Search" style="padding-right: 40px;">
+                          <button type="submit" style="position: absolute; right: 10px; top: 3%; transform: translateY(-50%); border: none; background: transparent; padding: 0;">
+                              <i class="fa fa-search"></i>
+                          </button>
+                      </div>
+                  </form>
+                </div>                 
+                <div class="col-md-3"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container p-3 bg-body-secondary" style="border: solid black 2px; border-radius: 1%;">
+      <i style="text-decoration: underline;" class="h3">My Projects</i><span style="font-weight: bold;"> : </span>
+      {% if user.is_authenticated %}
+          {% if my_projects %}
+              <div class="row m-3 hower_items">
+                  {% for project in my_projects %}
+                      <div class="col-md-4 mb-3 p-3">
+                          <a href="{% url 'seeproject' project.id %}" style="text-decoration: none;">
+                              <div class="card h-100">
+                                {% if project.project_logo %}
+                                    <img src="{{ project.project_logo.url }}" class="card-img-top" alt="Project_logo">
+                                {% else %}
+                                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ21J3-WHf675Nz_mvKZ1dFRC50UpsJzpIQlg&s" class="card-img-top" alt="Project_logo">
+                                {% endif %}
+                                  <div class="card-body">
+                                      <h5 class="card-title">{{ project.project_name }}</h5>
+                                      <p class="card-text">{{ project.project_description }}</p>
+                                      <p><strong>Mode:</strong> {{ project.project_mode|capfirst }}</p>
+  
+                                      {% if user.id != project.user.id %}
+                                          <p><strong>Created by:</strong> {{ project.user }}</p>
+                                      {% endif %}
+  
+                                      {% if project.get_tags %}
+                                          <p><strong>Tags:</strong></p>
+                                          <ul>
+                                              {% for tag in project.get_tags|slice:":3" %}
+                                                  <li>{{ tag }}</li>
+                                              {% endfor %}
+                                          </ul>
+                                          {% if project.get_tags|length > 3 %}
+                                              <p>+{{ project.get_tags|length|add:"-3" }} more</p>
+                                          {% endif %}
+                                      {% else %}
+                                          <p><em>No tags available</em></p>
+                                      {% endif %}
+                                  </div>
+                              </div>
+                          </a>
+                      </div>
+                  {% endfor %}
+                  <div><a style="text-decoration: none;" href="{% url 'allprojects' %}"><h4 class="text-center">See all My Projects >>></h4></a></div>
+              </div>
+          {% else %}
+              <p class="m-3">You have no projects to display. <a href="{% url 'createproject' %}">Create</a> a new project </p>
+          {% endif %}
+      {% else %}
+          <p class="m-3">Please <a href="{% url 'login' %}">login</a> first to check your projects!</p>
+      {% endif %}
+  </div>
+  
+
+  <div class="container mt-5 mb-3 p-3 bg-body-secondary" style="border: solid black 2px; border-radius: 1%;">
+    <i style="text-decoration: underline;" class="h3">Public Projects</i><span style="font-weight: bold;"> : </span>
+        {% if public_projects %}
+            <div class="row m-3 hower_items">
+                {% for project in public_projects %}
+                    <div class="col-md-4 mb-3 p-3">
+                        <a href="{% url 'seeproject' project.id %}" style="text-decoration: none;">
+                            <div class="card h-100">
+                                <img src="{{ project.project_logo.url }}" class="card-img-top" alt="{{ project.project_name }} logo">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ project.project_name }}</h5>
+                                    <p class="card-text">{{ project.project_description }}</p>
+                                    <p><strong>Mode:</strong> {{ project.project_mode|capfirst }}</p>
+
+                                    {% if user.id != project.user.id %}
+                                        <p><strong>Created by:</strong> {{ project.user }}</p>
+                                    {% endif %}
+
+                                    {% if project.get_tags %}
+                                        <p><strong>Tags:</strong></p>
+                                        <ul>
+                                            {% for tag in project.get_tags|slice:":3" %}
+                                                <li>{{ tag }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                        {% if project.get_tags|length > 3 %}
+                                            <p>+{{ project.get_tags|length|add:"-3" }} more</p>
+                                        {% endif %}
+                                    {% else %}
+                                        <p><em>No tags available</em></p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                {% endfor %}
+                <div><a style="text-decoration: none;" href="{% url 'allpublicprojects' %}"><h4 class="text-center">See all the Public Projects >>></h4></a></div>
+            </div>
+        {% else %}
+            <p class="m-3">There are no public projects to display.</p>
+        {% endif %}
+</div>
+
+
+<div class="row m-5 px-3 keyfeatures hower_items">
+  <h2 class="text-center mt-3 mb-4">Key Features</h2>
+  <div class="col-md-4">
+      <div class="card shadow-lg">
+          <img src="{% static 'imgs/keyfeatures/do1.jpg' %}" alt="" srcset="" class="img-fluid">
+          <div class="card-body">
+              <h5 class="card-title">Efficient Project Organization</h5>
+              <p class="card-text">ResearchNest allows you to create detailed project plans, assign tasks, and set milestones, all within a single, user-friendly interface.</p>
+          </div>
+      </div>
+  </div>
+  <div class="col-md-4 keyfeaturespd">
+      <div class="card shadow-lg">
+          <img src="{% static 'imgs/keyfeatures/sd1.jpg' %}" alt="" srcset="" class="img-fluid">
+          <div class="card-body">
+              <h5 class="card-title">Secure Data Management</h5>
+              <p class="card-text">ResearchNest offers state-of-the-art security features to protect your data from unauthorized access, ensuring it remains confidential and secure.</p>
+          </div>
+      </div>
+  </div>
+  <div class="col-md-4 keyfeaturespd">
+      <div class="card shadow-lg">
+          <img src="{% static 'imgs/keyfeatures/ds1.jpg' %}" alt="" srcset="" class="img-fluid">
+          <div class="card-body">
+              <h5 class="card-title">Flexible Data Sharing</h5>
+              <p class="card-text">Whether your research is meant for a select group or the broader academic community, ResearchNest provides flexible sharing options.</p>
+          </div>
+      </div>
+  </div>
+</div>
+
+
+<div class="container my-5">
+  <h2 class="text-center mb-5">Client Stories</h2>
+
+  <div id="clientStoriesCarousel" class="carousel slide" data-bs-ride="carousel">
+      <div class="carousel-indicators">
+          {% for testimonial in testimonials %}
+          <button type="button" data-bs-target="#clientStoriesCarousel" data-bs-slide-to="{{ forloop.counter0 }}" class="{% if forloop.first %}active{% endif %}" aria-label="Client {{ forloop.counter }}"></button>
+          {% endfor %}
+      </div>
+      <div class="carousel-inner">
+          {% for testimonial in testimonials %}
+          <div class="carousel-item {% if forloop.first %}active{% endif %}">
+              <div class="client-story">
+                  {% if testimonial.client_image %}
+                  <img src="{{ testimonial.client_image.url }}" alt="{{ testimonial.client_name }}" width="60" height="60">
+                  {% else %}
+                  <img src="https://img.freepik.com/premium-vector/silver-membership-icon-default-avatar-profile-icon-membership-icon-social-media-user-image-vector-illustration_561158-4215.jpg" alt="{{ testimonial.client_name }}" width="60" height="60">
+                  {% endif %}
+                  <h5>{{ testimonial.client_name }}</h5>
+                  <small>{{ testimonial.client_title }}</small>
+                  <p class="mt-3 mx-5 px-5">"{{ testimonial.client_story }}"</p>
+              </div>
+          </div>
+          {% endfor %}
+      </div>
+      <button class="carousel-control-prev" type="button" data-bs-target="#clientStoriesCarousel" data-bs-slide="prev">
+          <span class="fa-solid fa-chevron-left text-black fa-2x" aria-hidden="true"></span>
+          <span class="visually-hidden">Previous</span>
+      </button>
+      <button class="carousel-control-next" type="button" data-bs-target="#clientStoriesCarousel" data-bs-slide="next">
+          <span class="fa-solid fa-chevron-right text-black fa-2x" aria-hidden="true"></span>
+          <span class="visually-hidden">Next</span>
+      </button>
+  </div>
+</div>
+
+
+    <!-- <div class="d-flex pb-2 justify-content-end fixy pe-5"> -->
+      {% if user.is_authenticated %}
+          <button class="btn btn-success fixy my-3 rounded-circle" onclick="location.href='{% url 'createproject' %}';"><i class="fa-solid fa-plus fa-3x"></i></button>
+      {% else %}
+          <button class="btn btn-success fixy my-3 rounded-circle" onclick="location.href='{% url 'login' %}';"><i class="fa-solid fa-plus fa-3x"></i></button>
+      {% endif %}
+    <!-- </div> -->
+{% include 'footer.html' %}
+{% endblock %}

@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+{% include 'navbar.html' %}
+<section>
+    <!-- Background image -->
+    <div class="p-5 bg-image profilepic" style="background-image: url('{% static 'imgs/Profile/banner.jpg' %}');"></div>
+    <!-- Background image -->
+
+    <div class="card m-4 mx-md-5 shadow-5-strong bg-body-tertiary" style="
+          margin-top: -100px;
+          backdrop-filter: blur(30px);
+          ">
+      <div class="card-body py-5 px-md-5">
+        <div class="row d-flex justify-content-center">
+          <div class="col-lg-8">
+            <h2 class="fw-bold mb-5 myff text-center">Edit Profile</h2>
+            <form action="{% url 'editprofile' %}" method="post" enctype="multipart/form-data">
+              {% csrf_token %}
+              
+              <!-- Username -->
+              <div data-mdb-input-init class="form-outline mb-4">
+                <label class="form-label h5" for="username">Username</label>
+                <input type="text" id="username" name="username" class="form-control" value="{{ form.username.value }}" />
+                {% for error in form.username.errors %}
+                  <p class="text-danger">{{ error }}</p>
+                {% endfor %}
+              </div>
+              
+              <!-- First Name -->
+              <div data-mdb-input-init class="form-outline mb-4">
+                <label class="form-label h5" for="first_name">First Name</label>
+                <input type="text" id="first_name" name="first_name" class="form-control" value="{{ form.first_name.value }}" />
+                {% for error in form.first_name.errors %}
+                  <p class="text-danger">{{ error }}</p>
+                {% endfor %}
+              </div>
+              
+              <!-- Last Name -->
+              <div data-mdb-input-init class="form-outline mb-4">
+                <label class="form-label h5" for="last_name">Last Name</label>
+                <input type="text" id="last_name" name="last_name" class="form-control" value="{{ form.last_name.value }}" />
+                {% for error in form.last_name.errors %}
+                  <p class="text-danger">{{ error }}</p>
+                {% endfor %}
+              </div>
+              
+              <!-- Profile Picture -->
+              <div data-mdb-input-init class="form-outline mb-4">
+                <label class="form-label h5" for="profile_picture">Profile Picture</label>
+                <input type="file" id="profile_picture" name="profile_picture" class="form-control" />
+                {% for error in form.profile_picture.errors %}
+                  <p class="text-danger">{{ error }}</p>
+                {% endfor %}
+              </div>
+
+              <!-- Remove Profile Picture Checkbox -->
+              <div class="form-check mb-4">
+                <input class="form-check-input" type="checkbox" id="remove_profile_picture" name="remove_profile_picture">
+                <label class="form-check-label" for="remove_profile_picture">Remove Profile Picture</label>
+              </div>
+
+
+              <!-- Field of Study -->
+              <div data-mdb-input-init class="form-outline mb-4">
+                <label class="form-label h5" for="fieldOfStudy">Field of Study</label>
+                <select id="fieldOfStudy" name="field_of_study" class="form-control" onchange="toggleOtherField(this)">
+                    <option value="" disabled>Select your field of study</option>
+                    <option value="biology" {% if form.field_of_study.value == 'biology' %}selected{% endif %}>Biology</option>
+                    <option value="chemistry" {% if form.field_of_study.value == 'chemistry' %}selected{% endif %}>Chemistry</option>
+                    <option value="physics" {% if form.field_of_study.value == 'physics' %}selected{% endif %}>Physics</option>
+                    <option value="computer_science" {% if form.field_of_study.value == 'computer_science' %}selected{% endif %}>Computer Science</option>
+                    <option value="psychology" {% if form.field_of_study.value == 'psychology' %}selected{% endif %}>Psychology</option>
+                    <option value="other" {% if form.field_of_study.value == 'other' %}selected{% endif %}>Other (Please specify)</option>
+                </select>
+                {% for error in form.field_of_study.errors %}
+                  <p class="text-danger">{{ error }}</p>
+                {% endfor %}
+              </div>
+
+              <!-- Text input for 'Other' field -->
+              <div data-mdb-input-init class="form-outline mb-4" id="otherFieldDiv" style="display: none;">
+                <label class="form-label h5" for="otherFieldOfStudy">Please specify your field of study</label>
+                  <input type="text" id="otherFieldOfStudy" name="other_field_of_study" class="form-control" value="{{ form.other_field_of_study.value }}" />
+                  {% for error in form.other_field_of_study.errors %}
+                    <p class="text-danger">{{ error }}</p>
+                  {% endfor %}
+              </div>
+  
+              <!-- Submit button -->
+              <button type="submit" data-mdb-button-init data-mdb-ripple-init class="btn btn-primary btn-lg btn-block mb-2 form-control">
+                Save Changes
+              </button>
+
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+</section>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var selectElement = document.getElementById('fieldOfStudy');
+        toggleOtherField(selectElement);  // Call the function on load to handle existing values
+    });
+    function toggleOtherField(select) {
+        var otherFieldDiv = document.getElementById('otherFieldDiv');
+        if (select.value === 'other') {
+            otherFieldDiv.style.display = 'block';
+        } else {
+            otherFieldDiv.style.display = 'none';
+        }
+    }
+</script>
+{% endblock %}

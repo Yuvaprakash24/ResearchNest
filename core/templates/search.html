@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% block content %}
+{% include 'navbar.html' %}
+  <div class="container pt-5">
+    <h2>Search Results</h2>
+    <p>Results for "{{ query }}":</p>
+
+    <!-- {% if results %}
+      <ul class="list-group">
+        {% for result in results %}
+          <li class="list-group-item">
+            <a href="{% url 'seeproject' result.id %}">{{ result.project_name }}</a>
+            <p>{{ result.project_description }}</p>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>No results found for your search.</p>
+    {% endif %} -->
+    {% if projects %}
+        <div class="row">
+            {% for project in projects %}
+            <div class="col-md-4 mb-3">
+                <a href="{% url 'seeproject' project.id %}" style="text-decoration: none;">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ project.project_name }}</h5>
+                            <p class="card-text">{{ project.project_description }}</p>
+
+                            <p>
+                                <strong>Mode:</strong> {{ project.project_mode|capfirst }}
+                            </p>
+                            {% if user.id != project.user.id %}
+                            <p>
+                                <strong>Created by:</strong> {{ project.user }}
+                            </p>
+                            {% endif %}
+
+                            {% if project.get_tags %}
+                                <p><strong>Tags:</strong></p>
+                                <ul>
+                                    {% for tag in project.get_tags %}
+                                        <li>{{ tag }}</li>
+                                    {% endfor %}
+                                </ul>
+                            {% else %}
+                                <p>No tags available</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>No results found for your search.</p>
+    {% endif %}
+  </div>
+{% endblock %}

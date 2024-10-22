@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+{% include "navbar.html" %}
+<div class="container my-3">
+    <h2 class="mb-4">{% if project %}Edit{% else %}Create{% endif %} Project</h2>
+    <form id="project-form" enctype="multipart/form-data" method="POST" action="{% if project %}{% url 'editproject' project.id %}{% else %}{% url 'createproject' %}{% endif %}">
+
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="projectName" class="form-label">Project Name</label>
+            <input type="text" class="form-control" id="projectName" name="projectName" value="{{ project.project_name }}" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="projectDescription" class="form-label">Project Description</label>
+            <textarea class="form-control" id="projectDescription" name="projectDescription" rows="3" required>{{ project.project_description }}</textarea>
+        </div>
+
+        <div class="mb-3">
+            <label for="projectLogo" class="form-label">Project Logo</label>
+            <input type="file" class="form-control" id="projectLogo" name="projectLogo" accept="image/*">
+            {% if project.project_logo %}
+                <img src="{{ project.project_logo.url }}" alt="Project Logo" class="img-thumbnail mt-2" width="100">
+            {% endif %}
+            <small class="form-text text-muted">Upload your project logo (PNG, JPG, JPEG).</small>
+        </div>
+
+        <div class="mb-3">
+            <label for="projectMode" class="form-label">Mode</label>
+            <select class="form-select" id="projectMode" name="projectMode" required>
+                <option value="" disabled>Select mode</option>
+                <option value="public" {% if project.project_mode == 'public' %}selected{% endif %}>Public</option>
+                <option value="private" {% if project.project_mode == 'private' %}selected{% endif %}>Private</option>
+                <option value="protected" {% if project.project_mode == 'protected' %}selected{% endif %}>Protected</option>
+            </select>
+        </div>
+
+        <!-- Conditional Email Input -->
+        <div class="mb-3 hidden-field" id="emailField" style="display: {% if project.project_mode == 'protected' %}block{% else %}none{% endif %};">
+            <label for="protectedEmails" class="form-label">Allowed Emails (for Protected mode)</label>
+            <input type="text" class="form-control" id="protectedEmails" name="protectedEmails" placeholder="Enter emails separated by commas" value="{{ project.protected_emails }}">
+            <small class="form-text text-muted">Add emails of users allowed to access this project, separated by commas.</small>
+        </div>
+
+        <div class="mb-3">
+            <label for="tags" class="form-label">Tags</label>
+            <input type="text" class="form-control" id="tagsused" name="tagsused" value="{{ project.tags }}" placeholder="Enter the technologies separated by commas">
+            <small class="form-text text-muted">Add the technologies used in this project, separated by commas.</small>
+        </div>
+
+        <div class="mb-3">
+            <label for="filesInput" class="form-label">Choose Files</label>
+            <input type="file" id="filesInput" name="files[]" class="form-control" multiple>
+        </div>
+
+        <div class="mb-3">
+            <h5>Selected Files: <span id="fileCount">{{ project.project_files.count }}</span></h5>
+            <ul id="fileList" class="list-group">
+                {% for file in project.project_files.all %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        {{ file.clean_name }}
+                        <a href="{% url 'delete_file' file.id %}" class="btn btn-danger btn-sm">Delete</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <button type="submit" class="btn btn-primary text-end">{% if project %}Update{% else %}Create{% endif %} Project</button>
+    </form>
+</div>
+{% include 'simplefooter.html' %}
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var projectMode = document.getElementById('projectMode');
+        var emailField = document.getElementById('emailField');
+        var filesInput = document.getElementById('filesInput');
+        var fileList = document.getElementById('fileList');
+        var fileCount = document.getElementById('fileCount');
+        var selectedFiles = [];
+    
+        function toggleEmailField() {
+            if (projectMode.value === 'protected') {
+                emailField.style.display = 'block';
+            } else {
+                emailField.style.display = 'none';
+            }
+        }
+    
+        // Initially hide the email field
+        if(projectMode.value === 'protected'){
+            emailField.style.display = 'block';
+        } else {
+            emailField.style.display = 'none';
+        }
+        projectMode.addEventListener('change', toggleEmailField);
+    
+        // Function to handle file display for both files and folders
+        function displayFiles() {
+            fileList.innerHTML = '';
+            selectedFiles.forEach((file, index) => {
+                const li = document.createElement('li');
+                li.className = 'list-group-item d-flex justify-content-between align-items-center';
+                li.textContent = file.name;
+    
+                const deleteButton = document.createElement('button');
+                deleteButton.className = 'btn btn-danger btn-sm btn-close';
+                deleteButton.addEventListener('click', () => removeFile(index));
+    
+                li.appendChild(deleteButton);
+                fileList.appendChild(li);
+            });
+    
+            fileCount.textContent = selectedFiles.length;
+        }
+    
+        // Add new files to the existing selected files
+        function handleFileSelection(input) {
+            const files = [...input.files];
+            files.forEach(file => {
+                if (!selectedFiles.some(f => f.name === file.name && f.size === file.size)) {
+                    selectedFiles.push(file); // Add unique files
+                }
+            });
+    
+            displayFiles();
+        }
+    
+        // Remove a file from the list
+        function removeFile(index) {
+            selectedFiles.splice(index, 1);
+            displayFiles();
+        }
+    
+        // When a user selects files, append them to the existing selection
+        filesInput.addEventListener('change', function() {
+            handleFileSelection(filesInput);
+        });
+    
+        // Preserve the selected files when form is submitted
+        document.getElementById('project-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            
+            // Append all selected files to the formData
+            selectedFiles.forEach(file => {
+                formData.append('files[]', file);
+            });
+        
+            // Submit form via AJAX
+            fetch(this.action, {
+                method: 'POST',
+                body: formData,
+            }).then(response => {
+                if (response.ok) {
+                    // Check if the project exists, indicating it's an update
+                    if ("{{ project }}" !== "") { // Replace with appropriate check
+                        alert('Project updated successfully!');
+                    } else {
+                        alert('Project created successfully!');
+                    }
+                    window.location.href = "{% url 'allprojects' %}";
+                } else {
+                    alert('Error occurred while saving the project.');
+                }
+            });
+        });
+    });    
+</script>
+{% endblock %}

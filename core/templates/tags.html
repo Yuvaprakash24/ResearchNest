@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+{% include 'navbar.html' %}
+<div class="container pb-3">
+    <div class="row py-5">
+        <div class="col-md-7">
+            <h1>TAGS</h1>
+            <p>A <a href="https://en.wikipedia.org/wiki/Tag_(metadata)" target="_blank">tag</a> is a keyword or label that categorizes your question with other, similar questions. <br> Using the right tags makes it easier for others to find and answer your question.</p>
+            <div class="d-flex justify-content-between py-2">
+                <form class="d-flex" role="search" method="GET" action="{% url 'search_tags' %}">
+                    <input class="form-control me-2" name="query" type="search" placeholder="Filter by tag name" value="{{query}}" aria-label="Search">
+                    <button class="btn btn-primary" style="background-color: #00222b;" type="submit">Search</button>
+                </form>                 
+                <div class="btn-group" role="group" aria-label="Class buttons">
+                    <button type="button" class="btn btn-secondary active" data-filter="name" onclick="filterTags(this)">Name</button>
+                    <button type="button" class="btn btn-secondary" data-filter="new" onclick="filterTags(this)">New</button>
+                    <button type="button" class="btn btn-secondary" data-filter="tag_count" onclick="filterTags(this)">Tags Count</button>
+                 </div>                              
+            </div>
+        </div>
+        <div class="col-md-1"></div>
+        <div class="col-md-4 text-center">
+            <img src="{% static 'imgs/tags.png' %}" alt="" width="70%">
+        </div>
+     </div>
+     <div class="container p-3 border bg-light">
+        <h3 class="myff">
+            {% if query%}
+            Results for {{ query }}
+            {% else %}
+                Tag Name
+            {% endif %}
+        </h3>
+        <div class="row tags_filtered bg-body-secondary rounded">
+            {% if projects %}
+                {% for project in projects %}
+                <div class="col-md-4 mb-3 p-3">
+                    <a href="{% url 'seeproject' project.id %}" style="text-decoration: none;">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ project.project_name }}</h5>
+                                <p class="card-text">{{ project.project_description }}</p>
+                                <p><strong>Created by:</strong> {{ project.user }}</p>
+                                {% if project.get_tags %}
+                                    <p><strong>Tags:</strong></p>
+                                    <ul>
+                                        {% for tag in project.get_tags|slice:":3" %}
+                                            <li>{{ tag }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                    {% if project.get_tags|length > 3 %}
+                                        <p>+{{ project.get_tags|length|add:"-3" }} more</p>
+                                    {% endif %}
+                                {% else %}
+                                    <p><em>No tags available</em></p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                {% endfor %}
+            {% else %}
+            <h4>No projects on the given tag. Please try another tags!</h4>
+            {% endif %}
+         </div>         
+     </div>
+</div>
+{% include 'footer.html' %}
+
+<script>
+    function filterTags(button) {
+        // Remove 'active' class from all buttons
+        var buttons = document.querySelectorAll('.btn-group .btn');
+        buttons.forEach(function(btn) {
+            btn.classList.remove('active');
+        });
+        // Add 'active' class to the clicked button
+        button.classList.add('active');
+
+        // Get the filter type from the button's data-filter attribute
+        var filterType = button.getAttribute('data-filter');
+
+        // Make an AJAX request to fetch filtered tags
+        fetch(`/tags/filter?type=${filterType}`)
+        .then(response => response.json())
+        .then(data => {
+            // Clear the current tags
+            const tagsContainer = document.querySelector('.tags_filtered');
+            tagsContainer.innerHTML = '';
+
+            // Populate the tagsContainer with the filtered projects
+            if (data.projects.length > 0) {
+                data.projects.forEach(project => {
+                    const tagsList = project.tags.slice(0, 3).map(tag => `<li>${tag}</li>`).join('');
+                    const remainingTags = project.tags.length > 3 ? `<p>+${project.tags.length - 3} more</p>` : '';
+                    const projectCard = `
+                    <div class="col-md-4 mb-3 p-3">
+                        <a href="/seeproject/${project.id}" style="text-decoration: none;">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title">${project.project_name}</h5>
+                                    <p class="card-text">${project.project_description}</p>
+                                    <p><strong>Created by:</strong> ${project.user}</p>
+                                    ${project.tags.length > 0 ? `
+                                        <p><strong>Tags:</strong></p>
+                                        <ul>${tagsList}</ul>
+                                        ${remainingTags}
+                                    ` : `<p><em>No tags available</em></p>`}
+                                </div>
+                            </div>
+                        </a>
+                    </div>`;
+                    tagsContainer.innerHTML += projectCard;
+                });
+            } else {
+                tagsContainer.innerHTML = '<h4>No projects on the given tag. Please try another tag!</h4>';
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+</script>
+
+
+{% endblock %}

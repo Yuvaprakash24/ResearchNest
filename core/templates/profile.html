@@ -1,0 +1,27 @@
+{% extends 'base.html'%}
+{% load static%}
+{% block content %}
+{% include 'navbar.html' %}
+<h2 class="myff text-center mt-5">My Profile</h2>
+<div class="container m-5">
+    <div class="row profile">
+        <div class="col-md-6 text-center">
+            {% if profile_picture %}
+                <img src="{{ profile_picture }}" alt="Profile Picture" style="width:250px;height: 250px;border-radius:50%;object-fit: cover;">
+            {% else %}
+                <img src="https://img.freepik.com/premium-vector/silver-membership-icon-default-avatar-profile-icon-membership-icon-social-media-user-image-vector-illustration_561158-4215.jpg" alt="Default Profile Picture" style="width:250px;height: 250px;border-radius:50%;object-fit: cover;">
+            {% endif %}
+        </div>
+        <div class="col-md-6">
+            <p class="mb-3"><strong>Username:</strong> {{ name }}</p>
+            <p class="mb-3"><strong>Email:</strong> {{ email }}</p>
+            <p class="mb-3"><strong>First Name:</strong> {{ fname }}</p>
+            <p class="mb-3"><strong>Last Name:</strong> {{ lname }}</p>
+            <p class="mb-3"><strong>Field of Study:</strong> {{ field_study }}</p>
+            <a class="btn btn-lg btn-success" style="padding-left: 5%;padding-right: 5%;" href="{% url 'editprofile' %}">Edit Profile</a>
+        </div>
+    </div>
+</div>
+
+{% include 'footer.html' %}
+{% endblock %}

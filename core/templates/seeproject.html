@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+{% include 'navbar.html' %}
+<style>
+    .card_background {
+        position: relative;
+        height: 100vh;
+    }
+    
+    .card_background::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('{% if project.project_logo %}{{ project.project_logo.url }}{% else %}https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ21J3-WHf675Nz_mvKZ1dFRC50UpsJzpIQlg&s{% endif %}') no-repeat center center;
+        background-size: cover;
+        opacity: 0.25; /* Set background image opacity to 50% */
+        z-index: -1;
+    }
+</style>
+<div class="card_background">
+<h2>{{ project.project_name }}</h2>
+<p>Created by : {{project.user}}</p>
+<p>Created on : {{project.created_at}}</p>
+<p>{{ project.project_description }}</p>
+
+<p><strong>Mode:</strong> {{ project.project_mode }}</p>
+
+{% if project.get_tags %}
+    <p><strong>Tags:</strong></p>
+    <ul>
+        {% for tag in project.get_tags %}
+            <li>{{ tag }}</li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No tags available</p>
+{% endif %}
+
+<h3>Files:</h3>
+{% if project_files %}
+    <ul>
+        {% for file in project_files %}
+        <a style="text-decoration: none;" target="_blank" href="{{ file.file.url }}">
+            {{ file.clean_name }}
+        </a><br>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No files available.</p>
+{% endif %}
+{% if project.user == user or project.project_mode|lower == 'protected' %}
+    <!-- <button class="btn btn-outline-primary">Edit</button> -->
+    <a href="{% url 'editproject' project.id %}" class="btn btn-outline-primary">Edit</a>
+{% endif %}
+
+{% if project.user == user %}
+<a href="{% url 'delete_project' project.id %}" class="btn btn-outline-danger" onclick="return confirm('Are you sure you want to delete this project and all its files?');">Delete</a>
+{% endif %}
+<a href="{% url 'download_project_files' project.id %}" class="btn btn-outline-success">Download</a>
+</div>
+{% endblock %}
