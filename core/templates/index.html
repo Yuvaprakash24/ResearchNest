@@ -2,85 +2,91 @@
 {% load static %}
 {% block content %}
 <nav class="navbar navbar-dark bg-dark sticky-top">
-  <div class="container-fluid">
-    <a class="navbar-brand" href="{% url 'home' %}"><img src="{% static 'imgs/logo/2ch.png' %}" width="150%" alt="" srcset=""></a>
-    <div>
-      {% if user.is_authenticated %}
-      <a class="text-white me-3" style="text-decoration: none;">Hello, {{ user.username }}</a>
-      {% else %}
-      <a href="{% url 'login' %}?next={{ request.path }}" class="btn btn-success me-2">Login/Register</a>
-      {% endif %}
-      <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasDarkNavbar" aria-controls="offcanvasDarkNavbar">
+  <div class="container-fluid d-flex justify-content-between align-items-center">
+    <a class="navbar-brand" href="{% url 'home' %}">
+      <img src="{% static 'imgs/logo/2ch.png' %}" width="150%" alt="">
+    </a>
+
+    <div class="d-flex align-items-center">
+      <div class="d-none d-md-block">
+        {% if user.is_authenticated %}
+        <a class="text-white me-3" style="text-decoration: none;">Hello, {{ user.username }}</a>
+        {% else %}
+        <a href="{% url 'login' %}?next={{ request.path }}" class="btn btn-success me-2">Login/Register</a>
+        {% endif %}
+      </div>
+
+      <button class="navbar-toggler ms-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasDarkNavbar" aria-controls="offcanvasDarkNavbar">
         <span class="navbar-toggler-icon"></span>
       </button>
     </div>
-    <div class="offcanvas offcanvas-end text-bg-dark" tabindex="-1" id="offcanvasDarkNavbar" aria-labelledby="offcanvasDarkNavbarLabel">
-      <div class="offcanvas-header">
-        <!-- <h5 class="offcanvas-title" id="offcanvasDarkNavbarLabel">Dark offcanvas</h5> -->
-         <img src="{% static 'imgs/logo/2ch.png' %}">
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-      </div>
-      <div class="offcanvas-body">
-        <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
-          <li class="nav-item">
-            <a class="nav-link" aria-current="page" href="{% url 'home' %}">Home</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="{% url 'tags' %}">Tags</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="{% url 'createproject' %}">Create Project</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="{% url 'allpublicprojects' %}">Public Projects</a>
-          </li>
-          {% if user.is_authenticated %}
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-              My Projects
-            </a>
-            <ul class="dropdown-menu dropdown-menu-dark">
-              <li><a class="dropdown-item" href="{% url 'allprojects' %}">All</a></li>
-              <li>
-                <hr class="dropdown-divider">
-              </li>
-              <li><a class="dropdown-item" href="{% url 'userpublicprojects' %}">Public</a></li>
-              <li><a class="dropdown-item" href="{% url 'userprotectedprojects' %}">Protected</a></li>
-              <li><a class="dropdown-item" href="{% url 'userprivateprojects' %}">Private</a></li>
-            </ul>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="{% url 'profile' %}">My Profile</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="{% url 'todolist' %}">Project Planner</a>
-          </li>
-          {% endif %}
-          <li>
-            <hr class="divider">
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="{% url 'whyresearchnest' %}">Why ResearchNest</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="{% url 'aboutus' %}">About Us</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="{% url 'clientstories' %}">Client stories</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="{% url 'contactus' %}">Contact Us</a>
-          </li>
-          {% if user.is_authenticated %}
-          <li class="nav-item">
-            <a class="nav-link" href="{% url 'logout' %}">Logout</a>
-          </li>
-          {% endif %}
-        </ul>
-      </div>
+  </div>
+
+  <!-- Offcanvas for smaller screens -->
+  <div class="offcanvas offcanvas-end text-bg-dark" tabindex="-1" id="offcanvasDarkNavbar" aria-labelledby="offcanvasDarkNavbarLabel">
+    <div class="offcanvas-header">
+      <img src="{% static 'imgs/logo/2ch.png' %}">
+      <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+      <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
+        <li class="nav-item">
+          <a class="nav-link" aria-current="page" href="{% url 'home' %}">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'tags' %}">Tags</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'createproject' %}">Create Project</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'allpublicprojects' %}">Public Projects</a>
+        </li>
+        {% if user.is_authenticated %}
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">My Projects</a>
+          <ul class="dropdown-menu dropdown-menu-dark">
+            <li><a class="dropdown-item" href="{% url 'allprojects' %}">All</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="{% url 'userpublicprojects' %}">Public</a></li>
+            <li><a class="dropdown-item" href="{% url 'userprotectedprojects' %}">Protected</a></li>
+            <li><a class="dropdown-item" href="{% url 'userprivateprojects' %}">Private</a></li>
+          </ul>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'profile' %}">My Profile</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'todolist' %}">Project Planner</a>
+        </li>
+        {% endif %}
+        <li><hr class="divider"></li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'whyresearchnest' %}">Why ResearchNest</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'aboutus' %}">About Us</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'clientstories' %}">Client stories</a>
+        </li>
+        <li class="nav-item mb-1">
+          <a class="nav-link" href="{% url 'contactus' %}">Contact Us</a>
+        </li>
+        {% if user.is_authenticated %}
+        <li class="nav-item text-center w-100">
+          <a class="btn btn-danger w-100" href="{% url 'logout' %}">Logout</a>
+        </li>
+        {% else %}
+        <li class="nav-item d-md-none">
+          <a href="{% url 'login' %}?next={{ request.path }}" class="btn btn-success">Login/Register</a>
+        </li>
+        {% endif %}
+      </ul>
     </div>
   </div>
 </nav>
+
     <div class="container">
         <p class="myff text-center pt-3">Welcome to ResearchNest ! </p>
         <div class="grid">

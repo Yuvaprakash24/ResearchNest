@@ -41,12 +41,10 @@ def search_view(request):
         results = models.Project.objects.filter(
             Q(project_name__icontains=query) | Q(project_description__icontains=query) | Q(tags__icontains=query)
         )
-    print(results)
     context = {
         'query': query,
         'projects': results,
     }
-    print(context)
     return render(request, 'search.html', context)
 
 def signup(request):
