@@ -85,7 +85,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'defaultdb',
         'USER': 'avnadmin',
-        'PASSWORD': 'AVNS_RHOqU2WyyBPl0HlnJrI',
+        'PASSWORD': 'AIVEN_SERVICE_PASSWORD',
         'HOST': 'travellerwebsitedb-travellerwebsitedb.i.aivencloud.com',
         'PORT': '27311'
     }
@@ -137,9 +137,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': 'dzif6dxod',
-    'API_KEY': 'your_api_key',
-    'API_SECRET': 'your_api_secret'
+    'API_KEY': 'api_key',
+    'API_SECRET': 'api_secret_key'
 }
 
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+# MEDIA_URL = 'https://res.cloudinary.com/dzif6dxod/'  # Cloudinary media URL
 MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
