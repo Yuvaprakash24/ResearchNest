@@ -44,8 +44,8 @@
 {% if project_files %}
     <ul>
         {% for file in project_files %}
-        <a style="text-decoration: none;" target="_blank" href="{{ file.file.url }}">
-            {{ file.clean_name }}
+        <a style="text-decoration: none;" target="_blank" href="{{ file.url }}">
+            {{ file.name }}
         </a><br>
         {% endfor %}
     </ul>

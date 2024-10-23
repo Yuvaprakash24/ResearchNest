@@ -13,13 +13,19 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 from pathlib import Path
 import os
 import cloudinary
+import cloudinary_storage
 import cloudinary.uploader
-from cloudinary.utils import cloudinary_url
 import cloudinary.api
+from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+cloudinary.config( 
+    cloud_name = 'dzif6dxod',
+    api_key = '177462994851728', 
+    api_secret = 'woYRxuw__bm1pVhKHFuFpKxJov0'
+)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
@@ -28,9 +34,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-&sogj%xs-q9ak*d(%6d@ey%%-64702#!z$3+bxe^860wdea!ij'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
-ALLOWED_HOSTS = ['.vercel.app']
+ALLOWED_HOSTS = ['.vercel.app','127.0.0.1']
 
 
 # Application definition
@@ -86,7 +92,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'defaultdb',
         'USER': 'avnadmin',
-        'PASSWORD': os.getenv('DB_PASSWORD'),
+        'PASSWORD': 'AVNS_RHOqU2WyyBPl0HlnJrI',
         'HOST': 'travellerwebsitedb-travellerwebsitedb.i.aivencloud.com',
         'PORT': '27311'
     }
@@ -139,9 +145,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': 'dzif6dxod',
-    'API_KEY': os.getenv('API_Value'),
-    'API_SECRET': os.getenv('API_Security'),
-    'SECURE': True
+    'API_KEY': '177462994851728',
+    'API_SECRET': 'woYRxuw__bm1pVhKHFuFpKxJov0',
 }
-# Specify which storage to use for media and static files
-DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
+DEFAULT_FILE_STORAGE = 'cloudinary.storage.MediaCloudinaryStorage'
+MEDIA_URL = 'https://res.cloudinary.com/dzif6dxod/'

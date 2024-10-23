@@ -1,5 +1,4 @@
-import os
-import re
+import urllib.request
 from django.shortcuts import render,redirect, get_object_or_404
 from django.db.models import Q,Count
 from django.contrib import messages,auth
@@ -9,8 +8,11 @@ from django.urls import reverse
 from . import forms
 import zipfile
 import io
-from django.http import HttpResponse
+from django.http import HttpResponse,Http404,JsonResponse
 from django.conf import settings
+import cloudinary.uploader
+from django.core.files.uploadedfile import InMemoryUploadedFile
+from django.core.exceptions import PermissionDenied
 
 # Create your views here.
 from . import models
@@ -86,7 +88,6 @@ def login(request):
 @login_required
 def createproject(request):
     if request.method == 'POST':
-        # Process the form input
         messages.success(request, 'Project created successfully!')
         project_name = request.POST.get('projectName')
         project_description = request.POST.get('projectDescription')
@@ -95,7 +96,8 @@ def createproject(request):
         protected_emails = request.POST.get('protectedEmails') if project_mode == 'protected' else ''
         tags = request.POST.get('tagsused')
         files = request.FILES.getlist('files[]')
-        # Create the project instance and link it to the logged-in user
+
+        # Create the project instance
         project = models.Project.objects.create(
             user=request.user,
             project_name=project_name,
@@ -106,32 +108,21 @@ def createproject(request):
             tags=tags,
         )
 
-        # Handle file uploads and remove duplicates
-        def clean_filename(file_name):
-            # Use regex to remove Django's appended identifier (e.g., '_CG31PYu')
-            return re.sub(r'_[a-zA-Z0-9]{7}\.', '.', file_name)  # Matches 7-character suffix before the file extension
-
+        # Handle file uploads
         seen_files = set()
         for file in files:
-            clean_file_name = clean_filename(file.name)
-            if clean_file_name not in seen_files:
-                # Save the unique file
-                models.ProjectFile.objects.create(project=project, file=file)
-                seen_files.add(clean_file_name)
-
-        # Now check for and delete any duplicate files that may exist in the project
-        project_files = project.project_files.all()
-
-        for file_obj in project_files:
-            cleaned_file_name = clean_filename(file_obj.file.name)
-            if cleaned_file_name in seen_files:
-                # If a duplicate file is found, delete the file
-                file_obj.delete()
+            if isinstance(file, InMemoryUploadedFile):
+                # Store original filename
+                original_filename = file.name
+                if original_filename not in seen_files:
+                    project_file = models.ProjectFile.objects.create(
+                        project=project,
+                        file=file,
+                        original_filename=original_filename
+                    )
+                    seen_files.add(original_filename)
 
     return render(request, 'create_project.html')
-
-
-
 
 
 @login_required
@@ -221,7 +212,6 @@ def search_tags(request):
         projects = models.Project.objects.filter(project_mode='public')
     return render(request, 'tags.html', {'projects': projects , 'query':query})
 
-from django.http import JsonResponse
 
 def filter_tags(request):
     filter_type = request.GET.get('type')
@@ -344,55 +334,77 @@ def editprofile(request):
 #     return re.sub(r'_[a-zA-Z0-9]{7}\.', '.', file_name)
 
 def seeproject(request, project_id):
-    # Get the project and related files
     project = get_object_or_404(models.Project, id=project_id)
-    project_files = project.project_files.all()  # Retrieve all related files for the project
+    project_files = project.project_files.all()
 
-    # Clean the filenames
-    # cleaned_files = []
-    # for file in project_files:
-    #     cleaned_file_name = clean_filename(file.file.name).split('/')[-1]
-    #     cleaned_files.append({
-    #         'original': file,  # Original file object
-    #         'clean_name': cleaned_file_name,  # Cleaned file name
-    #     })
+    # Format file information for display
+    files_info = [{
+        'id': file.id,
+        'name': file.original_filename,
+        'url': file.file.url,
+    } for file in project_files]
 
     context = {
         'project': project,
-        'project_files': project_files,  
+        'project_files': files_info,
     }
 
     return render(request, 'seeproject.html', context)
 
+
 @login_required
 def download_project_files(request, project_id):
-    project = get_object_or_404(models.Project, id=project_id)
-    
-    # Ensure user has permission to download project files
-    if project.project_mode == 'private' and project.user != request.user:
-        return render(request, '403.html')  # Render a "Permission Denied" page
-    
-    if project.project_mode == 'protected' and request.user.email not in project.get_allowed_emails():
-        return render(request, '403.html')  # Render a "Permission Denied" page
+    """
+    Download all files from a project as a zip file.
+    Handles security checks and Cloudinary file downloads.
+    """
+    try:
+        # Get the project and check permissions
+        project = get_object_or_404(models.Project, id=project_id)
+        
+        # Security checks
+        if project.project_mode == 'private' and project.user != request.user:
+            raise PermissionDenied("You don't have permission to access this project.")
+            
+        if project.project_mode == 'protected' and request.user.email not in project.get_allowed_emails():
+            raise PermissionDenied("You don't have permission to access this project.")
 
-    # Collect all project files
-    project_files = project.project_files.all()
+        # Create a zip file in memory
+        zip_buffer = io.BytesIO()
+        
+        with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
+            for project_file in project.project_files.all():
+                try:
+                    # Get the secure URL from Cloudinary
+                    url = cloudinary.utils.cloudinary_url(project_file.file.public_id)[0]
+                    
+                    # Download the file from Cloudinary
+                    with urllib.request.urlopen(url) as response:
+                        file_content = response.read()
+                        
+                        # Add file to zip with original filename
+                        filename = project_file.original_filename
+                        zip_file.writestr(filename, file_content)
+                        
+                except Exception as e:
+                    # Log the error but continue with other files
+                    print(f"Error downloading file {project_file.original_filename}: {str(e)}")
+                    continue
 
-    # Create a zip file in memory
-    zip_buffer = io.BytesIO()
-    with zipfile.ZipFile(zip_buffer, 'w') as zip_file:
-        for project_file in project_files:
-            file_path = project_file.file.path  # Full file path on the server
-            file_name = project_file.clean_name()  # Clean filename
-            zip_file.write(file_path, file_name)  # Add file to zip with clean name
+        # Prepare the response
+        zip_buffer.seek(0)
+        response = HttpResponse(zip_buffer.getvalue(), content_type='application/zip')
+        safe_project_name = "".join(x for x in project.project_name if x.isalnum() or x in (' ', '-', '_'))
+        response['Content-Disposition'] = f'attachment; filename="{safe_project_name}_files.zip"'
+        
+        return response
 
-    zip_buffer.seek(0)
-
-    # Return zip file as downloadable response
-    response = HttpResponse(zip_buffer, content_type='application/zip')
-    response['Content-Disposition'] = f'attachment; filename={project.project_name}_files.zip'
-
-    return response
+    except models.Project.DoesNotExist:
+        raise Http404("Project not found")
+    except PermissionDenied as e:
+        return HttpResponse(str(e), status=403)
+    except Exception as e:
+        return HttpResponse(f"An error occurred: {str(e)}", status=500)
 
 @login_required
 def delete_project(request, project_id):
@@ -402,29 +414,32 @@ def delete_project(request, project_id):
     if project.user != request.user:
         return render(request, '403.html')  # Render a "Permission Denied" page
 
-    # Get all the project files and delete them from the file system
+    # Delete project files
     project_files = project.project_files.all()
     for project_file in project_files:
-        if os.path.exists(project_file.file.path):
-            os.remove(project_file.file.path)  # Delete the file from the file system
-        project_file.delete()  # Delete the file record from the database
+        # Cloudinary will automatically handle file deletion when the model is deleted
+        project_file.delete()
+
+    # Delete the project logo if it exists
+    if project.project_logo:
+        # Cloudinary will automatically handle file deletion when the model is deleted
+        project.project_logo = None
+        project.save()
 
     # Delete the project itself
     project.delete()
 
     messages.success(request, 'Project and associated files deleted successfully.')
-    return redirect('allprojects')  # Redirect to the user's profile page or another appropriate page
-
+    return redirect('allprojects')
 
 @login_required
 def editproject(request, project_id):
     project = get_object_or_404(models.Project, id=project_id)
     if project.user != request.user and request.user.email not in project.get_allowed_emails():
-        return render(request, '403.html')  # Render a "Permission Denied" page
+        return render(request, '403.html')
 
     if request.method == 'POST':
         messages.success(request, 'Project updated successfully!')
-        # Update project fields with form input
         project.project_name = request.POST.get('projectName')
         project.project_description = request.POST.get('projectDescription')
         project_mode = request.POST.get('projectMode')
@@ -432,7 +447,6 @@ def editproject(request, project_id):
         project.protected_emails = request.POST.get('protectedEmails') if project_mode == 'protected' else ''
         project.tags = request.POST.get('tagsused')
 
-        # Update project logo if a new one is uploaded
         if request.FILES.get('projectLogo'):
             project.project_logo = request.FILES['projectLogo']
 
@@ -440,26 +454,29 @@ def editproject(request, project_id):
 
         # Handle new files
         files = request.FILES.getlist('files[]')
-        
-        # Helper to clean duplicate file names
-        def clean_filename(file_name):
-            return re.sub(r'_[a-zA-Z0-9]{7}\.', '.', file_name)
-
-        seen_files = set(file.file.name for file in project.project_files.all())
+        seen_files = set(file.original_filename for file in project.project_files.all())
 
         for file in files:
-            clean_file_name = clean_filename(file.name)
-            if clean_file_name not in seen_files:
-                models.ProjectFile.objects.create(project=project, file=file)
-                seen_files.add(clean_file_name)
+            if isinstance(file, InMemoryUploadedFile):
+                original_filename = file.name
+                if original_filename not in seen_files:
+                    project_file = models.ProjectFile.objects.create(
+                        project=project,
+                        file=file,
+                        original_filename=original_filename
+                    )
+                    seen_files.add(original_filename)
 
         return redirect('seeproject', project_id=project.id)
 
     return render(request, 'create_project.html', {'project': project})
 
+
 @login_required
 def delete_file(request, file_id):
-    # file = get_object_or_404(models.ProjectFile, id=file_id, project__user=request.user)
     file = get_object_or_404(models.ProjectFile, id=file_id)
+    project_id = file.project.id
+    # Cloudinary will automatically handle file deletion
     file.delete()
-    return redirect('editproject', file.project.id)
+    messages.success(request, 'File deleted successfully.')
+    return redirect('editproject', project_id)
