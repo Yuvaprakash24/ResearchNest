@@ -16,6 +16,7 @@ import cloudinary
 import cloudinary.uploader
 from cloudinary.utils import cloudinary_url
 import cloudinary.api
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -27,9 +28,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-&sogj%xs-q9ak*d(%6d@ey%%-64702#!z$3+bxe^860wdea!ij'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['.vercel.app']
 
 
 # Application definition
@@ -85,7 +86,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'defaultdb',
         'USER': 'avnadmin',
-        'PASSWORD': 'AIVEN_SERVICE_PASSWORD',
+        'PASSWORD': os.getenv('DB_PASSWORD'),
         'HOST': 'travellerwebsitedb-travellerwebsitedb.i.aivencloud.com',
         'PORT': '27311'
     }
@@ -124,10 +125,10 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
-STATICFILES_DIRS=[
-    BASE_DIR/"static"
-]
+
 STATIC_URL = '/static/'
+STATICFILES_DIRS = os.path.join(BASE_DIR, 'static'),
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles_build', 'static')
 
 
 # Default primary key field type
@@ -135,13 +136,12 @@ STATIC_URL = '/static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': 'dzif6dxod',
-    'API_KEY': 'api_key',
-    'API_SECRET': 'api_secret_key'
+    'API_KEY': os.getenv('API_Value'),
+    'API_SECRET': os.getenv('API_Security'),
+    'SECURE': True
 }
-
+# Specify which storage to use for media and static files
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-# MEDIA_URL = 'https://res.cloudinary.com/dzif6dxod/'  # Cloudinary media URL
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
