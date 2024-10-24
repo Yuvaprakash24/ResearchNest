@@ -2,12 +2,14 @@
 {% load static %}
 {% block content %}
 {% include 'navbar.html' %}
+
 <style>
     .card_background {
         position: relative;
-        height: 100vh;
+        background-color: #f7f7f7;
+        display: flex;
     }
-    
+
     .card_background::before {
         content: '';
         position: absolute;
@@ -17,49 +19,219 @@
         bottom: 0;
         background: url('{% if project.project_logo %}{{ project.project_logo.url }}{% else %}https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ21J3-WHf675Nz_mvKZ1dFRC50UpsJzpIQlg&s{% endif %}') no-repeat center center;
         background-size: cover;
-        opacity: 0.25; /* Set background image opacity to 50% */
+        opacity: 0.15;
         z-index: -1;
     }
+
+    .project-card {
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 15px;
+        padding: 30px;
+        margin: 20px;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    /* Image Carousel Styles */
+    .image-carousel {
+        width: 100%;
+        margin: 0;
+        padding: 0;
+    }
+
+    .image-container {
+        display: flex;
+        overflow-x: auto;
+        scroll-behavior: smooth;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: thin;
+        scrollbar-color: #007bff #f0f0f0;
+        gap: 15px;
+        padding: 10px 0;
+        margin: 0;
+        width: 100%;
+    }
+
+    .image-container::-webkit-scrollbar {
+        height: 8px;
+    }
+
+    .image-container::-webkit-scrollbar-track {
+        background: #f0f0f0;
+        border-radius: 4px;
+    }
+
+    .image-container::-webkit-scrollbar-thumb {
+        background: #007bff;
+        border-radius: 4px;
+    }
+
+    .image-card {
+        flex: 0 0 auto;
+        width: 230px;
+        min-width: 230px;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        margin: 0;
+    }
+
+    .image-card img {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        border-radius: 8px 8px 0 0;
+    }
+
+    .image-card-body {
+        padding: 15px;
+    }
+
+    .image-card-title {
+        font-size: 1rem;
+        margin-bottom: 8px;
+        word-break: break-word;
+    }
+
+    .image-card-text {
+        font-size: 0.875rem;
+        color: #666;
+        margin-bottom: 10px;
+    }
+
+    .download-btn {
+        width: 100%;
+    }
+
+    /* Mobile Specific Styles */
+    @media (max-width: 767px) {
+        .container {
+            padding: 0;
+            margin: 0;
+            max-width: 100%;
+            display: block;
+        }
+        
+        .project-card {
+            padding: 15px 10px;
+            margin: 0;
+            border-radius: 0;
+        }
+
+        .image-carousel {
+            margin: 0 -10px; /* Negative margin to allow full-width scroll */
+            padding: 0;
+        }
+
+        .image-container {
+            padding: 10px;
+            gap: 10px;
+        }
+
+        .image-card {
+            width: 200px;
+            min-width: 200px;
+        }
+    }
 </style>
-<div class="card_background">
-<h2>{{ project.project_name }}</h2>
-<p>Created by : {{project.user}}</p>
-<p>Created on : {{project.created_at}}</p>
-<p>{{ project.project_description }}</p>
+<div class="container card_background">
+    <div class="project-card col-md-10">
+        <h2 class="text-center mb-4">{{ project.project_name }}</h2>
+        <div class="text-center mb-3">
+            <img src="{{ project.project_logo.url }}" alt="Project Logo" class="rounded-pill" width="100" height="100" onerror="this.style.display='none';">
+        </div>
+        
+        <p class="text-muted">Created by : {{ project.user }}</p>
+        <p class="text-muted">Created on : {{ project.created_at }}</p>
+        
+        <p class="lead">{{ project.project_description }}</p>
 
-<p><strong>Mode:</strong> {{ project.project_mode }}</p>
+        <p><strong>Mode:</strong> {{ project.project_mode }}</p>
 
-{% if project.get_tags %}
-    <p><strong>Tags:</strong></p>
-    <ul>
-        {% for tag in project.get_tags %}
-            <li>{{ tag }}</li>
-        {% endfor %}
-    </ul>
-{% else %}
-    <p>No tags available</p>
-{% endif %}
+        {% if project.get_tags %}
+            <p><strong>Tags:</strong></p>
+            <ul class="list-inline">
+                {% for tag in project.get_tags %}
+                    <li class="list-inline-item badge bg-primary text-white">{{ tag }}</li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="text-muted">No tags available</p>
+        {% endif %}
 
-<h3>Files:</h3>
-{% if project_files %}
-    <ul>
-        {% for file in project_files %}
-        <a style="text-decoration: none;" target="_blank" href="{{ file.url }}">
-            {{ file.name }}
-        </a><br>
-        {% endfor %}
-    </ul>
-{% else %}
-    <p>No files available.</p>
-{% endif %}
-{% if project.user == user or project.project_mode|lower == 'protected' %}
-    <!-- <button class="btn btn-outline-primary">Edit</button> -->
-    <a href="{% url 'editproject' project.id %}" class="btn btn-outline-primary">Edit</a>
-{% endif %}
+        <!-- Project Files Section -->
+        <h3 class="mt-5">Project Files</h3>
 
-{% if project.user == user %}
-<a href="{% url 'delete_project' project.id %}" class="btn btn-outline-danger" onclick="return confirm('Are you sure you want to delete this project and all its files?');">Delete</a>
-{% endif %}
-<a href="{% url 'download_project_files' project.id %}" class="btn btn-outline-success">Download</a>
+        <!-- Images Section -->
+        <h4>Images</h4>
+        <div class="image-carousel">
+            <div class="image-container">
+                {% for file in categorized_files.images %}
+                    <div class="image-card">
+                        <img src="{{ file.url }}" alt="{{ file.name }}">
+                        <div class="image-card-body">
+                            <h5 class="image-card-title">{{ file.name }}</h5>
+                            <p class="image-card-text">Uploaded on:<br>{{ file.uploaded_at|date:"d-m-Y H:i" }}</p>
+                            <a href="{{ file.url }}" class="btn btn-outline-primary btn-sm download-btn" download>Download</a>
+                        </div>
+                    </div>
+                {% empty %}
+                    <p>No image files available</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Documents Section -->
+        <h4>Documents</h4>
+        <div class="list-group mb-4">
+            {% for file in categorized_files.documents %}
+                <a href="{{ file.url }}" class="list-group-item list-group-item-action">{{ file.name }} <span class="float-end">Uploaded on : {{ file.uploaded_at|date:"d-m-Y H:i" }}</span></a>
+            {% empty %}
+                <p>No document files available</p>
+            {% endfor %}
+        </div>
+
+        <!-- Spreadsheets Section -->
+        <h4>Spreadsheets</h4>
+        <div class="list-group mb-4">
+            {% for file in categorized_files.spreadsheets %}
+                <a href="{{ file.url }}" class="list-group-item list-group-item-action">{{ file.name }}<span class="float-end">Uploaded on : {{ file.uploaded_at|date:"d-m-Y H:i" }}</span></a>
+            {% empty %}
+                <p>No spreadsheet files available</p>
+            {% endfor %}
+        </div>
+
+        <!-- Text Files Section -->
+        <h4>Text Files</h4>
+        <div class="list-group mb-4">
+            {% for file in categorized_files.text_files %}
+                <a href="{{ file.url }}" class="list-group-item list-group-item-action">{{ file.name }}<span class="float-end">Uploaded on : {{ file.uploaded_at|date:"d-m-Y H:i" }}</span></a>
+            {% empty %}
+                <p>No text files available</p>
+            {% endfor %}
+        </div>
+
+        <!-- Other Files Section -->
+        <h4>Other Files</h4>
+        <div class="list-group mb-4">
+            {% for file in categorized_files.others %}
+                <a href="{{ file.url }}" class="list-group-item list-group-item-action">{{ file.name }}<span class="float-end">Uploaded on : {{ file.uploaded_at|date:"d-m-Y H:i" }}</span></a>
+            {% empty %}
+                <p>No other files available</p>
+            {% endfor %}
+        </div>
+
+        <!-- Buttons for Edit, Delete, and Download -->
+        <div class="d-flex justify-content-end mt-4">
+            {% if project.user == user or project.project_mode|lower == 'protected' %}
+                <a href="{% url 'editproject' project.id %}" class="btn btn-outline-primary me-2">Edit Project</a>
+            {% endif %}
+            {% if project.user == user %}
+                <a href="{% url 'delete_project' project.id %}" class="btn btn-outline-danger me-2" onclick="return confirm('Are you sure you want to delete this project and all its files?');">Delete Project</a>
+            {% endif %}
+            <a href="{% url 'download_project_files' project.id %}" class="btn btn-outline-success">Download All Files</a>
+        </div>
+    </div>
 </div>
 {% endblock %}

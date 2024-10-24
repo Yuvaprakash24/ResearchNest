@@ -1,4 +1,5 @@
-import re
+import os
+import cloudinary
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
@@ -54,16 +55,65 @@ class Project(models.Model):
 
 
 class ProjectFile(models.Model):
+    FILE_TYPES = [
+        ('image', 'Image'),
+        ('document', 'Document'),
+        ('spreadsheet', 'Spreadsheet'),
+        ('text', 'Text'),
+        ('other', 'Other')
+    ]
+
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='project_files')
-    file = CloudinaryField('File', folder='project_files')
-    original_filename = models.CharField(max_length=255)  # Add this new field
+    file = CloudinaryField('File', folder='project_files', resource_type='auto')  # Changed to auto
+    original_filename = models.CharField(max_length=255)
+    file_type = models.CharField(max_length=20, choices=FILE_TYPES, default='other')
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    def determine_file_type(self):
+        ext = os.path.splitext(self.original_filename.lower())[1]
+        if ext in {'.jpg', '.jpeg', '.png', '.gif', '.bmp', '.svg', '.webp'}:
+            return 'image'
+        elif ext in {'.pdf', '.doc', '.docx'}:
+            return 'document'
+        elif ext in {'.xlsx', '.xls', '.csv', '.ods'}:
+            return 'spreadsheet'
+        elif ext in {'.txt', '.md', '.rtf'}:
+            return 'text'
+        return 'other'
+
+    def save(self, *args, **kwargs):
+        if not self.file_type or self.file_type == 'other':
+            self.file_type = self.determine_file_type()
+        super().save(*args, **kwargs)
 
     def clean_name(self):
         return self.original_filename
-
+    
+    def get_file_url(self):
+        if not self.file:
+            return None
+            
+        try:
+            # For PDFs, documents, and other non-image files
+            if self.file_type in ['document', 'spreadsheet', 'text', 'other']:
+                url = cloudinary.utils.cloudinary_url(
+                    self.file.public_id,
+                    resource_type='raw',  # Changed from 'auto' to 'raw'
+                    format=os.path.splitext(self.original_filename)[1][1:] if self.original_filename else None
+                )[0]
+            # For images
+            elif self.file_type == 'image':
+                url = cloudinary.utils.cloudinary_url(
+                    self.file.public_id,
+                    resource_type='image'
+                )[0]
+            
+            return url
+        except Exception as e:
+            print(f"Error generating URL for {self.original_filename}: {str(e)}")
+            return None
     def __str__(self):
-        return self.original_filename
-
+        return f"{self.original_filename} ({self.file_type})"
 
 class Todo(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)

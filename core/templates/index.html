@@ -107,7 +107,7 @@
         </div>
     </div>
 
-    <div class="container p-3 bg-body-secondary" style="border: solid black 2px; border-radius: 1%;">
+    <div class="mx-5 p-3 bg-body-secondary rounded" style="border: solid black 2px;">
       <i style="text-decoration: underline;" class="h3">My Projects</i><span style="font-weight: bold;"> : </span>
       {% if user.is_authenticated %}
           {% if my_projects %}
@@ -159,7 +159,7 @@
   </div>
   
 
-  <div class="container mt-5 mb-3 p-3 bg-body-secondary" style="border: solid black 2px; border-radius: 1%;">
+  <div class="mx-5 mt-5 mb-3 p-3 bg-body-secondary rounded" style="border: solid black 2px;">
     <i style="text-decoration: underline;" class="h3">Public Projects</i><span style="font-weight: bold;"> : </span>
         {% if public_projects %}
             <div class="row m-3 hower_items">

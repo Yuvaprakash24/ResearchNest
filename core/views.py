@@ -7,7 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.urls import reverse
 from . import forms
 import zipfile
-import io
+import io,os
 from django.http import HttpResponse,Http404,JsonResponse
 from django.conf import settings
 import cloudinary.uploader
@@ -20,7 +20,7 @@ def home(request):
     my_projects = {}
     public_projects = models.Project.objects.filter(
             Q(project_mode='public')   # Public projects
-        )[:6]
+        )[:3]
     testimonials = models.testimonial.objects.all()[:5]
     if(request.user.is_authenticated):
         user = request.user
@@ -29,10 +29,10 @@ def home(request):
             Q(user=user) |  # Projects owned by the user
             (Q(project_mode='public')  & Q(user=user)) |  # Public projects
             Q(project_mode='protected', protected_emails__icontains=user.email)  # Protected projects
-        )[:6]
+        )[:3]
         public_projects = models.Project.objects.filter(
             Q(project_mode='public')   # Public projects
-        ).exclude(user=user)[:6]
+        ).exclude(user=user)[:3]
     return render(request, 'index.html', {'my_projects': my_projects,'public_projects': public_projects,'testimonials': testimonials})
 
 def search_view(request):
@@ -88,39 +88,57 @@ def login(request):
 @login_required
 def createproject(request):
     if request.method == 'POST':
-        messages.success(request, 'Project created successfully!')
-        project_name = request.POST.get('projectName')
-        project_description = request.POST.get('projectDescription')
-        project_logo = request.FILES.get('projectLogo')
-        project_mode = request.POST.get('projectMode')
-        protected_emails = request.POST.get('protectedEmails') if project_mode == 'protected' else ''
-        tags = request.POST.get('tagsused')
-        files = request.FILES.getlist('files[]')
+        try:
+            # Create project first
+            project = models.Project.objects.create(
+                user=request.user,
+                project_name=request.POST.get('projectName'),
+                project_description=request.POST.get('projectDescription'),
+                project_mode=request.POST.get('projectMode'),
+                protected_emails=request.POST.get('protectedEmails') if request.POST.get('projectMode') == 'protected' else '',
+                tags=request.POST.get('tagsused')
+            )
 
-        # Create the project instance
-        project = models.Project.objects.create(
-            user=request.user,
-            project_name=project_name,
-            project_description=project_description,
-            project_logo=project_logo,
-            project_mode=project_mode,
-            protected_emails=protected_emails,
-            tags=tags,
-        )
-
-        # Handle file uploads
-        seen_files = set()
-        for file in files:
-            if isinstance(file, InMemoryUploadedFile):
-                # Store original filename
-                original_filename = file.name
-                if original_filename not in seen_files:
-                    project_file = models.ProjectFile.objects.create(
-                        project=project,
-                        file=file,
-                        original_filename=original_filename
+            # Handle project logo separately
+            if 'projectLogo' in request.FILES:
+                try:
+                    logo_result = cloudinary.uploader.upload(
+                        request.FILES['projectLogo'],
+                        folder=f'project_logos/{project.id}',
+                        resource_type='image'
                     )
-                    seen_files.add(original_filename)
+                    project.project_logo = logo_result['secure_url']
+                    project.save()
+                except Exception as e:
+                    messages.error(request, f'Error uploading logo: {str(e)}')
+
+            # Handle multiple file uploads
+            files = request.FILES.getlist('files[]')
+            upload_errors = []
+            
+            for file in files:
+                success, error = handle_file_upload(file, project)
+                if not success:
+                    upload_errors.append(f"Error uploading {file.name}: {error}")
+            
+            all_files = models.ProjectFile.objects.filter(project=project)
+            seen_filenames = set()
+            for project_file in all_files:
+                if project_file.original_filename in seen_filenames:
+                    project_file.delete()  # Remove duplicate
+                else:
+                    seen_filenames.add(project_file.original_filename)
+
+            if upload_errors:
+                messages.warning(request, "Some files failed to upload: " + "; ".join(upload_errors))
+            else:
+                messages.success(request, 'Project created successfully!')
+            
+            return redirect('seeproject', project_id=project.id)
+
+        except Exception as e:
+            messages.error(request, f'Error creating project: {str(e)}')
+            return render(request, 'create_project.html')
 
     return render(request, 'create_project.html')
 
@@ -318,85 +336,107 @@ def editprofile(request):
     return render(request, 'editprofile.html', {'form': form})
 
 
-# def seeproject(request, project_id):
-#     project = get_object_or_404(models.Project, id=project_id)
-#     project_files = project.project_files.all()
-#     context = {
-#         'project': project,
-#         'project_files': project_files,
-#     }
-#     return render(request, 'seeproject.html', context)
-
-
-# def clean_filename(file_name):
-#     # Use regex to remove Django's appended identifier (e.g., '_CG31PYu')
-#     # Matches 7-character suffix before the file extension
-#     return re.sub(r'_[a-zA-Z0-9]{7}\.', '.', file_name)
-
 def seeproject(request, project_id):
     project = get_object_or_404(models.Project, id=project_id)
     project_files = project.project_files.all()
-
-    # Format file information for display
-    files_info = [{
-        'id': file.id,
-        'name': file.original_filename,
-        'url': file.file.url,
-    } for file in project_files]
-
+    
+    # Define file extensions for each category
+    image_extensions = {'.jpg', '.jpeg', '.png', '.gif', '.bmp', '.svg', '.webp'}
+    document_extensions = {'.pdf', '.doc', '.docx', '.ppt', '.pptx'}
+    spreadsheet_extensions = {'.xlsx', '.xls', '.csv', '.ods'}
+    text_extensions = {'.txt', '.md', '.rtf'}
+    
+    # Initialize categories
+    categorized_files = {
+        'images': [],
+        'documents': [],
+        'spreadsheets': [],
+        'text_files': [],
+        'others': []
+    }
+    
+    # Categorize files
+    for file in project_files:
+        file_info = {
+            'id': file.id,
+            'name': file.original_filename,
+            'url': file.get_file_url(),
+            'uploaded_at': file.uploaded_at,
+        }
+        
+        # Get file extension (lowercase for consistent comparison)
+        _, ext = os.path.splitext(file.original_filename.lower())
+        
+        # Categorize based on extension
+        if ext in image_extensions:
+            categorized_files['images'].append(file_info)
+        elif ext in document_extensions:
+            categorized_files['documents'].append(file_info)
+        elif ext in spreadsheet_extensions:
+            categorized_files['spreadsheets'].append(file_info)
+        elif ext in text_extensions:
+            categorized_files['text_files'].append(file_info)
+        else:
+            categorized_files['others'].append(file_info)
+    
     context = {
         'project': project,
-        'project_files': files_info,
+        'categorized_files': categorized_files,
     }
-
     return render(request, 'seeproject.html', context)
 
 
 @login_required
 def download_project_files(request, project_id):
-    """
-    Download all files from a project as a zip file.
-    Handles security checks and Cloudinary file downloads.
-    """
     try:
         # Get the project and check permissions
         project = get_object_or_404(models.Project, id=project_id)
-        
+
         # Security checks
         if project.project_mode == 'private' and project.user != request.user:
             raise PermissionDenied("You don't have permission to access this project.")
-            
+
         if project.project_mode == 'protected' and request.user.email not in project.get_allowed_emails():
             raise PermissionDenied("You don't have permission to access this project.")
 
         # Create a zip file in memory
         zip_buffer = io.BytesIO()
-        
+
         with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
             for project_file in project.project_files.all():
                 try:
-                    # Get the secure URL from Cloudinary
-                    url = cloudinary.utils.cloudinary_url(project_file.file.public_id)[0]
+                    # Get the correct download URL based on file type
+                    download_url = project_file.get_file_url()
                     
-                    # Download the file from Cloudinary
-                    with urllib.request.urlopen(url) as response:
+                    if not download_url:
+                        print(f"Skipping {project_file.original_filename}: No valid URL")
+                        continue
+
+                    # Download the file content using urllib
+                    with urllib.request.urlopen(download_url) as response:
                         file_content = response.read()
-                        
                         # Add file to zip with original filename
-                        filename = project_file.original_filename
-                        zip_file.writestr(filename, file_content)
-                        
+                        zip_file.writestr(project_file.original_filename, file_content)
+
+                except urllib.error.URLError as e:
+                    print(f"Failed to download {project_file.original_filename}: {str(e)}")
+                    continue
                 except Exception as e:
-                    # Log the error but continue with other files
-                    print(f"Error downloading file {project_file.original_filename}: {str(e)}")
+                    print(f"Error processing {project_file.original_filename}: {str(e)}")
                     continue
 
         # Prepare the response
         zip_buffer.seek(0)
         response = HttpResponse(zip_buffer.getvalue(), content_type='application/zip')
+
+        # Create a safe project name for the zip file
         safe_project_name = "".join(x for x in project.project_name if x.isalnum() or x in (' ', '-', '_'))
-        response['Content-Disposition'] = f'attachment; filename="{safe_project_name}_files.zip"'
-        
+        zip_filename = f'{safe_project_name}_files.zip'
+
+        # Add headers for download
+        response['Content-Disposition'] = f'attachment; filename="{zip_filename}"'
+        response['Content-Length'] = len(zip_buffer.getvalue())
+
         return response
 
     except models.Project.DoesNotExist:
@@ -404,7 +444,9 @@ def download_project_files(request, project_id):
     except PermissionDenied as e:
         return HttpResponse(str(e), status=403)
     except Exception as e:
-        return HttpResponse(f"An error occurred: {str(e)}", status=500)
+        print(f"Download error: {str(e)}")  # Log the error
+        return HttpResponse(f"An error occurred while preparing the download: {str(e)}", status=500)
+
 
 @login_required
 def delete_project(request, project_id):
@@ -439,35 +481,55 @@ def editproject(request, project_id):
         return render(request, '403.html')
 
     if request.method == 'POST':
-        messages.success(request, 'Project updated successfully!')
-        project.project_name = request.POST.get('projectName')
-        project.project_description = request.POST.get('projectDescription')
-        project_mode = request.POST.get('projectMode')
-        project.project_mode = project_mode
-        project.protected_emails = request.POST.get('protectedEmails') if project_mode == 'protected' else ''
-        project.tags = request.POST.get('tagsused')
+        try:
+            # Update project details
+            project.project_name = request.POST.get('projectName')
+            project.project_description = request.POST.get('projectDescription')
+            project.project_mode = request.POST.get('projectMode')
+            project.protected_emails = request.POST.get('protectedEmails') if request.POST.get('projectMode') == 'protected' else ''
+            project.tags = request.POST.get('tagsused')
 
-        if request.FILES.get('projectLogo'):
-            project.project_logo = request.FILES['projectLogo']
-
-        project.save()
-
-        # Handle new files
-        files = request.FILES.getlist('files[]')
-        seen_files = set(file.original_filename for file in project.project_files.all())
-
-        for file in files:
-            if isinstance(file, InMemoryUploadedFile):
-                original_filename = file.name
-                if original_filename not in seen_files:
-                    project_file = models.ProjectFile.objects.create(
-                        project=project,
-                        file=file,
-                        original_filename=original_filename
+            # Handle project logo update
+            if 'projectLogo' in request.FILES:
+                try:
+                    logo_result = cloudinary.uploader.upload(
+                        request.FILES['projectLogo'],
+                        folder=f'project_logos/{project.id}',
+                        resource_type='image'
                     )
-                    seen_files.add(original_filename)
+                    project.project_logo = logo_result['secure_url']
+                except Exception as e:
+                    messages.error(request, f'Error uploading logo: {str(e)}')
 
-        return redirect('seeproject', project_id=project.id)
+            project.save()
+
+            # Handle new file uploads
+            files = request.FILES.getlist('files[]')
+            upload_errors = []
+            
+            for file in files:
+                success, error = handle_file_upload(file, project)
+                if not success:
+                    upload_errors.append(f"Error uploading {file.name}: {error}")
+
+            all_files = models.ProjectFile.objects.filter(project=project)
+            seen_filenames = set()
+            for project_file in all_files:
+                if project_file.original_filename in seen_filenames:
+                    project_file.delete()  # Remove duplicate
+                else:
+                    seen_filenames.add(project_file.original_filename)
+            
+            if upload_errors:
+                messages.warning(request, "Some files failed to upload: " + "; ".join(upload_errors))
+            else:
+                messages.success(request, 'Project updated successfully!')
+
+            return redirect('seeproject', project_id=project.id)
+
+        except Exception as e:
+            messages.error(request, f'Error updating project: {str(e)}')
+            return render(request, 'create_project.html', {'project': project})
 
     return render(request, 'create_project.html', {'project': project})
 
@@ -480,3 +542,30 @@ def delete_file(request, file_id):
     file.delete()
     messages.success(request, 'File deleted successfully.')
     return redirect('editproject', project_id)
+
+
+def handle_file_upload(file, project):
+    try:
+        # Determine if it's an image based on file extension
+        _, ext = os.path.splitext(file.name.lower())
+        is_image = ext in {'.jpg', '.jpeg', '.png', '.gif', '.bmp', '.svg', '.webp'}
+        
+        # Upload with appropriate resource type
+        upload_result = cloudinary.uploader.upload(
+            file,
+            folder=f'project_files/{project.id}',
+            resource_type='image' if is_image else 'raw',
+            use_filename=True,
+            unique_filename=True
+        )
+        
+        # Create ProjectFile instance
+        project_file = models.ProjectFile.objects.create(
+            project=project,
+            file=upload_result['public_id'],
+            original_filename=file.name
+        )
+        
+        return True, None
+    except Exception as e:
+        return False, str(e)
