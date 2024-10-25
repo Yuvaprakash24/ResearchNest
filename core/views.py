@@ -279,7 +279,7 @@ def todolist(request):
             todo_item = form.save(commit=False)
             todo_item.user = request.user
             todo_item.save()
-            messages.success(request, "Todo item added successfully!")
+            messages.success(request, "Project Planner item added successfully!")
             return redirect('todolist')
         else:
             for field, errors in form.errors.items():

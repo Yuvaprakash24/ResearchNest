@@ -24,7 +24,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 cloudinary.config( 
     cloud_name = 'dzif6dxod',
     api_key = os.getenv('API_Value'), 
-    api_secret =  os.getenv('API_Security')
+    api_secret =  os.getenv('API_Security'),
+    secure = True
 )
 
 # Quick-start development settings - unsuitable for production
@@ -147,6 +148,7 @@ CLOUDINARY_STORAGE = {
     'CLOUD_NAME': 'dzif6dxod',
     'API_KEY': os.getenv('API_Value'),
     'API_SECRET':  os.getenv('API_Security'),
+    'secure' : True
 }
 
 DEFAULT_FILE_STORAGE = 'cloudinary.storage.MediaCloudinaryStorage'

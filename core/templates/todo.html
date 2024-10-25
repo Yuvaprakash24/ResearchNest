@@ -2,6 +2,18 @@
 {% load static %}
 {% block content %}
 
+<style>
+  .responsive-header{
+    display: flex;
+    justify-content: space-between;
+  }
+  @media (max-width: 768px){
+    .responsive-header{
+      flex-direction: column;
+    }
+  }
+</style>
+
 {% include 'navbar.html' %}
 <div  class="container-fluid">
 
@@ -26,25 +38,29 @@
     <div class="row">
   
       <div class="col-md-8">
-  
         {% for i in list %}
-        <div class="card">
-          <div class="px-3 pt-3" style="display: flex;justify-content: space-between;">
-            <b>Title : {{i.title}}</b>
-            Due data : {{i.date}}
-          </div>
-          <hr/>
-          <span class="px-4">{{i.details}}</span>
-          <br />
-          <form action="/del/{{i.id}}" method="POST" style=" padding-right: 4%; padding-bottom: 3%;">
-            {% csrf_token %}
-            <button value="remove" type="submit"  class="btn btn-danger" style="float: right;"><i class="fa fa-trash" aria-hidden="true"></i>&nbsp; remove</button>
-          </form>
+        <div class="card mt-3 shadow-sm border-0 rounded">
+            <div class="px-3 pt-3 responsive-header bg-light rounded-top d-flex align-items-center justify-content-between">
+                <h5 class="m-0">Title: <span class="fw-bold">{{ i.title }}</span></h5>
+                <small class="text-muted">Due date: {{ i.date }}</small>
+            </div>
+            <div class="card-body">
+                <p class="card-text">{{ i.details }}</p>
+            </div>
+            <div class="card-footer bg-white border-0 text-end">
+                <form action="/del/{{ i.id }}" method="POST">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-sm btn-danger">
+                        <i class="fa fa-trash" aria-hidden="true"></i> Remove
+                    </button>
+                </form>
+            </div>
         </div>
-        {% endfor%}
-      </div>
+        {% endfor %}
+    </div>
+    
       <!-- <div class="col-md-1"> </div> -->
-      <div class="col-md-4">
+      <div class="col-md-4 mt-3">
         <div class="todolist_submit_form bg-dark p-3 rounded " style="color: aliceblue;">
           <form method="POST" class="needs-validation" novalidate>
             <h2>Create:</h2>

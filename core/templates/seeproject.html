@@ -134,6 +134,15 @@
             min-width: 200px;
         }
     }
+    .responsive-header{
+        display: flex;
+        justify-content: space-between;
+      }
+      @media (max-width: 768px){
+        .responsive-header{
+          flex-direction: column;
+        }
+    }
 </style>
 <div class="container card_background">
     <div class="project-card col-md-10">
@@ -170,10 +179,10 @@
                 {% for file in categorized_files.images %}
                     <div class="image-card">
                         <img src="{{ file.url }}" alt="{{ file.name }}">
-                        <div class="image-card-body">
+                        <div class="image-card-body text-center">
                             <h5 class="image-card-title">{{ file.name }}</h5>
                             <p class="image-card-text">Uploaded on:<br>{{ file.uploaded_at|date:"d-m-Y H:i" }}</p>
-                            <a href="{{ file.url }}" class="btn btn-outline-primary btn-sm download-btn" download>Download</a>
+                            <a target="_blank" href="{{ file.url }}" class="btn btn-outline-primary btn-sm download-btn" download>Download</a>
                         </div>
                     </div>
                 {% empty %}
@@ -185,18 +194,27 @@
         <!-- Documents Section -->
         <h4>Documents</h4>
         <div class="list-group mb-4">
-            {% for file in categorized_files.documents %}
-                <a href="{{ file.url }}" class="list-group-item list-group-item-action">{{ file.name }} <span class="float-end">Uploaded on : {{ file.uploaded_at|date:"d-m-Y H:i" }}</span></a>
-            {% empty %}
-                <p>No document files available</p>
-            {% endfor %}
+            {% if categorized_files.documents %}
+                {% for file in categorized_files.documents %}
+                    <a href="{{ file.url }}" class="list-group-item list-group-item-action responsive-header">
+                        <span>{{ file.name }}</span>
+                        <small class="text-muted">Uploaded on: {{ file.uploaded_at|date:"d-m-Y H:i" }}</small>
+                    </a>
+                {% endfor %}
+            {% else %}
+                <p class="text-muted">No document files available</p>
+            {% endif %}
         </div>
+
 
         <!-- Spreadsheets Section -->
         <h4>Spreadsheets</h4>
         <div class="list-group mb-4">
             {% for file in categorized_files.spreadsheets %}
-                <a href="{{ file.url }}" class="list-group-item list-group-item-action">{{ file.name }}<span class="float-end">Uploaded on : {{ file.uploaded_at|date:"d-m-Y H:i" }}</span></a>
+                <a href="{{ file.url }}" class="list-group-item list-group-item-action responsive-header">
+                    <span>{{ file.name }}</span>
+                    <small class="text-muted">Uploaded on: {{ file.uploaded_at|date:"d-m-Y H:i" }}</small>
+                </a>
             {% empty %}
                 <p>No spreadsheet files available</p>
             {% endfor %}
@@ -206,7 +224,10 @@
         <h4>Text Files</h4>
         <div class="list-group mb-4">
             {% for file in categorized_files.text_files %}
-                <a href="{{ file.url }}" class="list-group-item list-group-item-action">{{ file.name }}<span class="float-end">Uploaded on : {{ file.uploaded_at|date:"d-m-Y H:i" }}</span></a>
+                <a href="{{ file.url }}" class="list-group-item list-group-item-action responsive-header">
+                    <span>{{ file.name }}</span>
+                        <small class="text-muted">Uploaded on: {{ file.uploaded_at|date:"d-m-Y H:i" }}</small>
+                </a>
             {% empty %}
                 <p>No text files available</p>
             {% endfor %}
@@ -216,7 +237,10 @@
         <h4>Other Files</h4>
         <div class="list-group mb-4">
             {% for file in categorized_files.others %}
-                <a href="{{ file.url }}" class="list-group-item list-group-item-action">{{ file.name }}<span class="float-end">Uploaded on : {{ file.uploaded_at|date:"d-m-Y H:i" }}</span></a>
+                <a href="{{ file.url }}" class="list-group-item list-group-item-action responsive-header">
+                    <span>{{ file.name }}</span>
+                        <small class="text-muted">Uploaded on: {{ file.uploaded_at|date:"d-m-Y H:i" }}</small>
+                </a>
             {% empty %}
                 <p>No other files available</p>
             {% endfor %}
