@@ -71,8 +71,8 @@ def login(request):
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
-        next_url = request.POST.get('next', request.GET.get('next',reverse('home')))
-        print(f"Next URL: {next_url}")
+        # next_url = request.POST.get('next', request.GET.get('next',reverse('home')))
+        next_url = request.POST.get('next') or request.GET.get('next') or reverse('home')
         user = authenticate(username=username, password=password)
 
         if user is not None:
