@@ -85,8 +85,11 @@ def login(request):
         next_url = request.GET.get('next', reverse('home'))
         return render(request, "login.html", {'next': next_url})
 
-@login_required
+
 def createproject(request):
+    if not request.user.is_authenticated:
+        messages.warning(request,"Please LogIn first to create the project")
+        return render(request, 'login.html')
     if request.method == 'POST':
         try:
             # Create project first

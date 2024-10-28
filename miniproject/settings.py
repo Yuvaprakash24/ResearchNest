@@ -35,7 +35,7 @@ cloudinary.config(
 SECRET_KEY = 'django-insecure-&sogj%xs-q9ak*d(%6d@ey%%-64702#!z$3+bxe^860wdea!ij'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['.vercel.app','127.0.0.1']
 
