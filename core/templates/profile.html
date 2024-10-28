@@ -2,26 +2,68 @@
 {% load static%}
 {% block content %}
 {% include 'navbar.html' %}
-<h2 class="myff text-center mt-5">My Profile</h2>
-<div class="container m-5">
-    <div class="row profile">
-        <div class="col-md-6 text-center">
-            {% if profile_picture %}
-                <img src="{{ profile_picture }}" alt="Profile Picture" style="width:250px;height: 250px;border-radius:50%;object-fit: cover;">
-            {% else %}
-                <img src="https://img.freepik.com/premium-vector/silver-membership-icon-default-avatar-profile-icon-membership-icon-social-media-user-image-vector-illustration_561158-4215.jpg" alt="Default Profile Picture" style="width:250px;height: 250px;border-radius:50%;object-fit: cover;">
-            {% endif %}
-        </div>
-        <div class="col-md-6">
-            <p class="mb-3"><strong>Username:</strong> {{ name }}</p>
-            <p class="mb-3"><strong>Email:</strong> {{ email }}</p>
-            <p class="mb-3"><strong>First Name:</strong> {{ fname }}</p>
-            <p class="mb-3"><strong>Last Name:</strong> {{ lname }}</p>
-            <p class="mb-3"><strong>Field of Study:</strong> {{ field_study }}</p>
-            <a class="btn btn-lg btn-success" style="padding-left: 5%;padding-right: 5%;" href="{% url 'editprofile' %}">Edit Profile</a>
+<div class="container my-3">
+    <div class="card profile-card text-dark bg-body-secondary mx-auto p-4 shadow-lg" style="max-width: 700px; border-radius: 15px;">
+        <h2 class="myff text-center">My Profile</h2>
+        <div class="d-flex flex-column align-items-center">
+            <div class="profile-image mb-4">
+                {% if profile_picture %}
+                    <img src="{{ profile_picture }}" alt="Profile Picture" class="rounded-circle" style="width: 150px; height: 150px; object-fit: cover; transition: transform 0.3s;">
+                {% else %}
+                    <img src="https://img.freepik.com/premium-vector/silver-membership-icon-default-avatar-profile-icon-membership-icon-social-media-user-image-vector-illustration_561158-4215.jpg" alt="Default Profile Picture" class="rounded-circle" style="width: 150px; height: 150px; object-fit: cover; transition: transform 0.3s;">
+                {% endif %}
+            </div>
+            <div class="card-body text-center">
+                <h2 class="card-title">{{ name|title }}</h2>
+                <p class="mb-4">Member since {{ user.date_joined|date:"F Y" }}</p>
+                <div class="text-left profile-info">
+                    <p><i class="fas fa-envelope"></i> <strong>Email:</strong> {{ email }}</p>
+                    <p><i class="fas fa-user"></i> <strong>First Name:</strong> {{ fname }}</p>
+                    <p><i class="fas fa-user"></i> <strong>Last Name:</strong> {{ lname }}</p>
+                    <p><i class="fas fa-graduation-cap"></i> <strong>Field of Study:</strong> {{ field_study|title }}</p>
+                </div>
+                <a href="{% url 'editprofile' %}" class="btn btn-gradient mt-4" style="padding: 10px 30px;">Edit Profile</a>
+            </div>
         </div>
     </div>
 </div>
 
-{% include 'footer.html' %}
+<!-- Additional CSS Styles -->
+<style>
+    .profile-card {
+        background: #2c2c2e;
+        color: #e6e6e6;
+    }
+    .profile-image img:hover {
+        transform: scale(1.1);
+    }
+    .profile-info p {
+        font-size: 1.1rem;
+        margin-bottom: 8px;
+    }
+    .profile-info i {
+        color: #8b8b8b;
+        margin-right: 8px;
+    }
+    .btn-gradient {
+        background: linear-gradient(90deg, #ff8a00, #e52e71);
+        color: #fff;
+        border: none;
+        border-radius: 25px;
+        font-weight: bold;
+        transition: all 0.3s;
+    }
+    .btn-gradient:hover {
+        background: linear-gradient(90deg, #e52e71, #ff8a00);
+        transform: scale(1.05);
+    }
+</style>
+
+
+<div class="d-none d-lg-block">
+    {% include 'footer.html' %}
+</div>
+<div class="d-lg-none">
+    {% include 'simplefooter.html' %}
+</div>
 {% endblock %}

@@ -13,7 +13,7 @@
             <!-- Grid column -->
             <div class="col-md-3 col-lg-3 col-xl-3 mx-auto mt-3">
               <img src="{% static 'imgs/logo/2ch.png' %}" width="100%"/>
-              <p class="p-3">
+              <p class="p-lg-3 p-sm-3 p-md-1">
                 Empowering researchers with secure, organized data management and collaborative tools. Share your work with confidence in a protected environment.
               </p>
             </div>
@@ -23,18 +23,18 @@
   
             <!-- Grid column -->
             <div class="col-md-2 col-lg-2 col-xl-2 mx-auto mt-3">
-              <h6 class="text-uppercase mb-4 font-weight-bold pt-lg-4 pt-md-4">Products</h6>
+              <h6 class="text-uppercase mb-4 font-weight-bold pt-lg-4 pt-md-4">Know Us</h6>
               <p>
-                <a>MDBootstrap</a>
+                <a href="{% url 'whyresearchnest' %}">Why ResearchNest</a>
               </p>
               <p>
-                <a>MDWordPress</a>
+                <a href="{% url 'aboutus' %}">About Us</a>
               </p>
               <p>
-                <a>BrandFlow</a>
+                <a href="{% url 'clientstories' %}">Client Stories</a>
               </p>
               <p>
-                <a>Bootstrap Angular</a>
+                <a href="{% url 'howcreateproject' %}">How to use ResearchNest</a>
               </p>
             </div>
             <!-- Grid column -->
@@ -47,16 +47,16 @@
                 Personal links
               </h6>
               <p>
-                <a>Your Account</a>
+                <a href="{% url 'profile' %}">Your Account</a>
               </p>
               <p>
-                <a>Your Projects</a>
+                <a href="{% url 'allpublicprojects' %}">Public Projects</a>
               </p>
               <p>
-                <a>Settings</a>
+                <a href="{% url 'allprojects' %}">Your Projects</a>
               </p>
               <p>
-                <a>Help</a>
+                <a href="{% url 'todolist' %}">Project Planner</a>
               </p>
             </div>
   
@@ -67,7 +67,7 @@
             <div class="col-md-4 col-lg-3 col-xl-3 mx-auto mt-3 pt-lg-4 pt-md-4">
               <h6 class="text-uppercase mb-4 font-weight-bold">Contact</h6>
               <p><i class="fas fa-home mr-3"></i> ACEEC, Ghatkesar</p>
-              <p><i class="fas fa-envelope mr-3"></i> 21ag1a1220@gmail.com</p>
+              <p><i class="fas fa-envelope mr-3"></i> researchnest@gmail.com</p>
               <p><i class="fas fa-phone mr-3"></i> + 91 944 035 6328</p>
               <p><i class="fas fa-print mr-3"></i> + 01 234 567 89</p>
             </div>

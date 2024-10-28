@@ -31,20 +31,20 @@
                             {% endif %}
 
                             {% if project.get_tags %}
-                              <p><strong>Tags:</strong></p>
-                              <div class="d-inline-flex align-items-center">
-                                  <ul class="list-inline mb-0">
-                                      {% for tag in project.get_tags|slice:":3" %}
-                                          <li class="list-inline-item badge bg-primary text-white">{{ tag }}</li>
-                                      {% endfor %}
-                                  </ul>
-                                  {% if project.get_tags|length > 3 %}
-                                      <small class="ms-2 mt-1 list-inline-item badge bg-danger text-white">+{{ project.get_tags|length|add:"-3" }} more</small>
-                                  {% endif %}
-                              </div>
-                          {% else %}
-                              <p><em>No tags available</em></p>
-                          {% endif %}
+                                <p><strong>Tags:</strong></p>
+                                <div class="d-flex flex-wrap align-items-center gap-2">
+                                    <ul class="list-inline mb-0 d-flex flex-wrap gap-2">
+                                        {% for tag in project.get_tags|slice:":3" %}
+                                            <li class="list-inline-item badge bg-primary text-white">{{ tag }}</li>
+                                        {% endfor %}
+                                        {% if project.get_tags|length > 3 %}
+                                            <li class="list-inline-item badge bg-danger text-white">+{{ project.get_tags|length|add:"-3" }} more</li>
+                                        {% endif %}
+                                    </ul>
+                                </div>
+                            {% else %}
+                                <p><em>No tags available</em></p>
+                            {% endif %}
                         </div>
                     </div>
                 </a>

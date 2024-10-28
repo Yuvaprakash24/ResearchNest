@@ -111,7 +111,7 @@
       <i style="text-decoration: underline;" class="h3">My Projects</i><span style="font-weight: bold;"> : </span>
       {% if user.is_authenticated %}
           {% if my_projects %}
-              <div class="row m-3 hower_items">
+              <div class="row m-lg-3 hower_items">
                   {% for project in my_projects %}
                       <div class="col-md-4 mb-3 p-3">
                           <a href="{% url 'seeproject' project.id %}" style="text-decoration: none;">
@@ -132,17 +132,20 @@
   
                                       {% if project.get_tags %}
                                           <p><strong>Tags:</strong></p>
-                                          <ul>
-                                              {% for tag in project.get_tags|slice:":3" %}
-                                                  <li>{{ tag }}</li>
-                                              {% endfor %}
-                                          </ul>
-                                          {% if project.get_tags|length > 3 %}
-                                              <p>+{{ project.get_tags|length|add:"-3" }} more</p>
-                                          {% endif %}
+                                          <div class="d-flex flex-wrap align-items-center gap-2">
+                                              <ul class="list-inline mb-0 d-flex flex-wrap gap-2">
+                                                  {% for tag in project.get_tags|slice:":3" %}
+                                                      <li class="list-inline-item badge bg-primary text-white">{{ tag }}</li>
+                                                  {% endfor %}
+                                                  {% if project.get_tags|length > 3 %}
+                                                      <li class="list-inline-item badge bg-danger text-white">+{{ project.get_tags|length|add:"-3" }} more</li>
+                                                  {% endif %}
+                                              </ul>
+                                          </div>
                                       {% else %}
                                           <p><em>No tags available</em></p>
                                       {% endif %}
+
                                   </div>
                               </div>
                           </a>
@@ -162,7 +165,7 @@
   <div class="mx-5 mt-5 mb-3 p-3 bg-body-secondary rounded" style="border: solid black 2px;">
     <i style="text-decoration: underline;" class="h3">Public Projects</i><span style="font-weight: bold;"> : </span>
         {% if public_projects %}
-            <div class="row m-3 hower_items">
+            <div class="row m-lg-3 hower_items">
                 {% for project in public_projects %}
                     <div class="col-md-4 mb-3 p-3">
                         <a href="{% url 'seeproject' project.id %}" style="text-decoration: none;">
@@ -183,17 +186,19 @@
 
                                     {% if project.get_tags %}
                                         <p><strong>Tags:</strong></p>
-                                        <ul>
-                                            {% for tag in project.get_tags|slice:":3" %}
-                                                <li>{{ tag }}</li>
-                                            {% endfor %}
-                                        </ul>
-                                        {% if project.get_tags|length > 3 %}
-                                            <p>+{{ project.get_tags|length|add:"-3" }} more</p>
-                                        {% endif %}
+                                        <div class="d-flex flex-wrap align-items-center gap-2">
+                                            <ul class="list-inline mb-0 d-flex flex-wrap gap-2">
+                                                {% for tag in project.get_tags|slice:":3" %}
+                                                    <li class="list-inline-item badge bg-primary text-white">{{ tag }}</li>
+                                                {% endfor %}
+                                                {% if project.get_tags|length > 3 %}
+                                                    <li class="list-inline-item badge bg-danger text-white">+{{ project.get_tags|length|add:"-3" }} more</li>
+                                                {% endif %}
+                                            </ul>
+                                        </div>
                                     {% else %}
                                         <p><em>No tags available</em></p>
-                                    {% endif %}
+                                    {% endif %}    
                                 </div>
                             </div>
                         </a>

@@ -43,20 +43,21 @@
                             {% endif %}
 
                             {% if project.get_tags %}
-                              <p><strong>Tags:</strong></p>
-                              <div class="d-inline-flex align-items-center">
-                                  <ul class="list-inline mb-0">
-                                      {% for tag in project.get_tags|slice:":3" %}
-                                          <li class="list-inline-item badge bg-primary text-white">{{ tag }}</li>
-                                      {% endfor %}
-                                  </ul>
-                                  {% if project.get_tags|length > 3 %}
-                                      <small class="ms-2 mt-1 list-inline-item badge bg-danger text-white">+{{ project.get_tags|length|add:"-3" }} more</small>
-                                  {% endif %}
-                              </div>
-                          {% else %}
-                              <p><em>No tags available</em></p>
-                          {% endif %}
+                                <p><strong>Tags:</strong></p>
+                                <div class="d-flex flex-wrap align-items-center gap-2">
+                                    <ul class="list-inline mb-0 d-flex flex-wrap gap-2">
+                                        {% for tag in project.get_tags|slice:":3" %}
+                                            <li class="list-inline-item badge bg-primary text-white">{{ tag }}</li>
+                                        {% endfor %}
+                                        {% if project.get_tags|length > 3 %}
+                                            <li class="list-inline-item badge bg-danger text-white">+{{ project.get_tags|length|add:"-3" }} more</li>
+                                        {% endif %}
+                                    </ul>
+                                </div>
+                            {% else %}
+                                <p><em>No tags available</em></p>
+                            {% endif %}
+
                         </div>
                     </div>
                 </a>
@@ -64,8 +65,20 @@
             {% endfor %}
         </div>
     {% else %}
-        <p>You have no projects to display.</p>
+        <div class="text-center my-5">
+            <img src="https://assets.skyfilabs.com/images/blog/good-computer-science-projects-for-beginners.webp" alt="No projects illustration" class="img-fluid mb-3" style="max-width: 300px;">
+            <h3 class="text-secondary">No {{heading}} Projects Available Yet</h3>
+            {% if heading == 'Public' %}
+                <p class="text-muted">Be the first to create and share a public project with our community.</p>
+            {% else %}
+                <p class="text-muted">Kickstart your journey by creating your first project!</p>
+            {% endif %}
+            <a href="{% url 'createproject' %}" class="btn btn-primary mt-3">Create Your First Project</a>
+            <p class="text-muted mt-4">Don't know how to crate the project? Check out <a href="{% url 'howcreateproject' %}">How to create Project</a> in ResearchNest.</p>
+        </div>
     {% endif %}
 </div>
-
+<div>
+{% include 'simplefooter.html' %}
+</div>
 {% endblock %}

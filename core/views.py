@@ -161,14 +161,6 @@ def allpublicprojects(request):
     projects = models.Project.objects.filter(
             Q(project_mode='public')   # Public projects
         )
-    if (request.user.is_authenticated):
-        user = request.user
-
-        # Query to fetch projects based on visibility and user permissions
-        projects = models.Project.objects.filter(
-            Q(project_mode='public')   # Public projects
-        ).exclude(user=user)
-
     return render(request, 'allprojects.html', {'projects': projects, 'heading': 'Public'})
 
 @login_required
@@ -306,6 +298,9 @@ def remove(request, item_id):
 
 def whyresearchnest(request):
     return render(request,'whyresearchnest.html')
+
+def howcreateproject(request):
+    return render(request,'howtocreateproject.html')
 
 def aboutus(request):
     return render(request,'aboutus.html')

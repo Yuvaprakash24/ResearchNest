@@ -66,8 +66,12 @@
          </div>         
      </div>
 </div>
-{% include 'footer.html' %}
-
+<div class="d-none d-lg-block">
+    {% include 'footer.html' %}
+</div>
+<div class="d-lg-none">
+    {% include 'simplefooter.html' %}
+</div>
 <script>
     function filterTags(button) {
         // Remove 'active' class from all buttons
