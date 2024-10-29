@@ -198,10 +198,10 @@ def project_detail(request, project_id):
 
     # Check permissions based on project mode
     if project.project_mode == 'private' and project.user != request.user:
-        return render(request, '403.html')  # Render a "Permission Denied" page
+        return render(request, '404.html')  # Render a "Permission Denied" page
     
     if project.project_mode == 'protected' and request.user.email not in project.get_allowed_emails():
-        return render(request, '403.html')  # Render a "Permission Denied" page
+        return render(request, '404.html')  # Render a "Permission Denied" page
 
     return render(request, 'project_detail.html', {'project': project})
 
@@ -498,7 +498,7 @@ def delete_project(request, project_id):
     
     # Ensure only the owner of the project can delete it
     if project.user != request.user:
-        return render(request, '403.html')  # Render a "Permission Denied" page
+        return render(request, '404.html')  # Render a "Permission Denied" page
 
     # Delete project files
     project_files = project.project_files.all()
@@ -516,13 +516,33 @@ def delete_project(request, project_id):
     project.delete()
 
     messages.success(request, 'Project and associated files deleted successfully.')
+    user_email = request.user.email
+    user_name = request.user
+    project_name = project.project_name
+    send_mail(
+        'Project Deleted Successfully on ResearchNest!',
+        '',
+        'settings.EMAIL_HOST_USER',  # From email
+        [user_email],  # To email
+        fail_silently=False,
+        html_message=f'''
+        <h3>Hi <strong>{user_name}</strong>,</h3><br>
+        <h2>Project Deleted Successfully!</h2>
+        <p>Your project <strong>"{project_name}"</strong> has been deleted successfully.</p>
+        <p>Thank you <strong>{user_name}</strong>, for being a part of the ResearchNest project.</p>
+        <br>
+        <p>Best regards,</p>
+        <p>ResearchNest Team</p>
+        '''
+    )
     return redirect('allprojects')
 
 @login_required
 def editproject(request, project_id):
     project = get_object_or_404(models.Project, id=project_id)
-    if project.user != request.user and request.user.email not in project.get_allowed_emails():
-        return render(request, '403.html')
+    if project.user != request.user:
+        if request.user.email not in project.get_allowed_emails():
+            return render(request, '404.html')
 
     if request.method == 'POST':
         try:
