@@ -12,6 +12,7 @@ from django.http import HttpResponse,Http404,JsonResponse
 from django.conf import settings
 import cloudinary.uploader
 from django.core.files.uploadedfile import InMemoryUploadedFile
+from django.core.mail import send_mail
 from django.core.exceptions import PermissionDenied
 
 # Create your views here.
@@ -57,6 +58,33 @@ def signup(request):
             
             user.save()
             auth_login(request, user)  # Log the user in after registration
+            user_email = request.user.email
+            user_name = request.user
+            send_mail(
+                'Welcome to ResearchNest!',
+                '',
+                'settings.EMAIL_HOST_USER',  # From email
+                [user_email],  # To email
+                fail_silently=False,
+                html_message=f'''
+                    <h3>Hi <strong>{user_name}</strong>,</h3>
+                    <br>
+                    <h2>Welcome to ResearchNest!</h2>
+                    <p>Thank you {user_name}, for being a part of the ResearchNest project. We're excited to have you with us!</p>
+                    <br>
+                    <p>Your account has been created successfully, and you can now:</p>
+                    <ul>
+                        <li>Manage your projects easily.</li>
+                        <li>Collaborate with other researchers.</li>
+                        <li>Access resources and support.</li>
+                    </ul>
+                    <br>
+                    <p>If you have any questions, feel free to <a href="mailto:researchnest.tech@gmail.com">contact our support team</a>.</p>
+                    <br>
+                    <p>Best regards,</p>
+                    <p>ResearchNest Team</p>
+                    '''
+                )
             return redirect('home')  # Redirect to 'home' after successful signup
     else:
         form = forms.SignUpForm()
@@ -136,7 +164,25 @@ def createproject(request):
                 messages.warning(request, "Some files failed to upload: " + "; ".join(upload_errors))
             else:
                 messages.success(request, 'Project created successfully!')
-            
+                user_email = request.user.email
+                user_name = request.user
+                project_name = project.project_name
+                send_mail(
+                    'Project Created Successfully on ResearchNest!',
+                    '',
+                    'settings.EMAIL_HOST_USER',  # From email
+                    [user_email],  # To email
+                    fail_silently=False,
+                    html_message=f'''
+                        <h3>Hi <strong>{user_name}</strong>,</h3><br>
+                        <h2>Project Created Successfully!</h2>
+                        <p>Your project <strong>"{project_name}"</strong> has been created successfully.</p>
+                        <p>Thank you <strong>{user_name}</strong>, for being a part of the ResearchNest project.</p>
+                        <br>
+                        <p>Best regards,</p>
+                        <p>ResearchNest Team</p>
+                        '''
+                )
             return redirect('seeproject', project_id=project.id)
 
         except Exception as e:
@@ -522,6 +568,42 @@ def editproject(request, project_id):
                 messages.warning(request, "Some files failed to upload: " + "; ".join(upload_errors))
             else:
                 messages.success(request, 'Project updated successfully!')
+                user_email = request.user.email
+                user_name = request.user
+                project_name = project.project_name
+                send_mail(
+                    'Project Edited Successfully on ResearchNest!',
+                    '',
+                    'settings.EMAIL_HOST_USER',  # From email
+                    [user_email],  # To email
+                    fail_silently=False,
+                    html_message=f'''
+                        <h3>Hi <strong>{user_name}</strong>,</h3><br>
+                        <h2>Project Edited Successfully!</h2>
+                        <p>Your project <strong>"{project_name}"</strong> has been edited successfully.</p>
+                        <p>Thank you <strong>{user_name}</strong>, for being a part of the ResearchNest project.</p>
+                        <br>
+                        <p>Best regards,</p>
+                        <p>ResearchNest Team</p>
+                        '''
+                )
+                if project.project_mode == 'protected':
+                    protected_emails = project.get_allowed_emails()
+                    for email in protected_emails:
+                        send_mail(
+                            'Project Edited in Protected Mode on ResearchNest!',
+                            '',
+                            'settings.EMAIL_HOST_USER',  # From email
+                            [email],  # To email
+                            fail_silently=False,
+                            html_message=f'''
+                                <h3>Hi,</h3><br>
+                                <h2>Project Edited Successfully!</h2>
+                                <p>The project <strong>"{project_name}"</strong> has been edited by {user_name}.</p>
+                                <p>Best regards,</p>
+                                <p>ResearchNest Team</p>
+                            '''
+                        )
 
             return redirect('seeproject', project_id=project.id)
 
