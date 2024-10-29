@@ -609,6 +609,9 @@ def editproject(request, project_id):
                 )
                 if project.project_mode == 'protected':
                     protected_emails = project.get_allowed_emails()
+                    if user_email in protected_emails:
+                        protected_emails.remove(user_email)
+                        protected_emails.append(project.user.email)
                     for email in protected_emails:
                         send_mail(
                             'Project Edited in Protected Mode on ResearchNest!',
