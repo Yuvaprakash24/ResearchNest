@@ -44,4 +44,4 @@ class TodoForm(forms.ModelForm):
 class ContactForm(forms.ModelForm):
     class Meta:
         model = Contact
-        fields = ['full_name', 'email', 'subject', 'category', 'message', 'created_at']
+        fields = ['full_name', 'email', 'subject', 'category', 'message']
