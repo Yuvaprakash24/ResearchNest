@@ -360,6 +360,9 @@ def contactus(request):
         if form.is_valid():
             contact = form.save()
             messages.success(request, "Your message has been sent successfully!")
+            send_emailto=[settings.EMAIL_HOST_USER,contact.email]
+            if(contact.email != request.user.email):
+                send_emailto.append(request.user.email)
             send_mail(
                 subject=f"New Contact Form Submission: {contact.subject}",
                 message=(
@@ -369,10 +372,11 @@ def contactus(request):
                     f"Message:\n{contact.message}"
                 ),
                 from_email=settings.EMAIL_HOST_USER,
-                recipient_list=[settings.EMAIL_HOST_USER,request.user.email],  # Add your email to receive notifications
+                recipient_list=send_emailto,  # Add your email to receive notifications
                 fail_silently=False,
             )
         else:
+            print(form.errors)
             messages.error(request, "There was an error with your submission. Please try again.")
     else:
         form = forms.ContactForm()

@@ -13,12 +13,22 @@
     {% endfor %}
 </div>
 {% endif %}
+{% if form.errors %}
+    <div class="alert alert-danger">
+        <strong>Please fix the following errors:</strong>
+        <ul>
+            {% for field, errors in form.errors.items %}
+                <li>{{ field }}: {{ errors|join:", " }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endif %}
 <div class="container my-5">
     <h2>Get in Touch</h2>
     <p>If you have any questions or need help, please fill out the form below. We do our best to respond within 1 business day.</p>
     <div class="row mt-2">
         <div class="col-md-8">
-            <form>
+            <form method="POST">
                 {% csrf_token %}
                 <div class="mb-3">
                     <label for="fullName" class="form-label">Full Name</label>
@@ -36,10 +46,10 @@
                     <label for="category" class="form-label">Category</label>
                     <select class="form-select" id="category" name="category">
                         <option selected>Select a category...</option>
-                        <option value="1">General Inquiry</option>
-                        <option value="2">Support</option>
-                        <option value="3">Feedback</option>
-                    </select>
+                        <option value="general">General Inquiry</option>
+                        <option value="support">Support</option>
+                        <option value="feedback">Feedback</option>
+                    </select>                    
                 </div>
                 <div class="mb-3">
                     <label for="message" class="form-label">Message</label>
