@@ -355,6 +355,27 @@ def aboutus(request):
     return render(request,'aboutus.html')
 
 def contactus(request):
+    if request.method == 'POST':
+        form = forms.ContactForm(request.POST)
+        if form.is_valid():
+            contact = form.save()
+            messages.success(request, "Your message has been sent successfully!")
+            send_mail(
+                subject=f"New Contact Form Submission: {contact.subject}",
+                message=(
+                    f"Name: {contact.full_name}\n"
+                    f"Email: {contact.email}\n"
+                    f"Category: {contact.get_category_display()}\n"
+                    f"Message:\n{contact.message}"
+                ),
+                from_email=settings.EMAIL_HOST_USER,
+                recipient_list=[settings.EMAIL_HOST_USER,request.user.email],  # Add your email to receive notifications
+                fail_silently=False,
+            )
+        else:
+            messages.error(request, "There was an error with your submission. Please try again.")
+    else:
+        form = forms.ContactForm()
     return render(request,'contactus.html')
 
 def clientstories(request):
@@ -622,7 +643,7 @@ def editproject(request, project_id):
                             html_message=f'''
                                 <h3>Hi,</h3><br>
                                 <h2>Project Edited Successfully!</h2>
-                                <p>The project <strong>"{project_name}"</strong> has been edited by {user_name}.</p>
+                                <p>The project <strong>"{project_name}"</strong> has been edited by <strong>{user_name}</strong>.</p>
                                 <p>Best regards,</p>
                                 <p>ResearchNest Team</p>
                             '''

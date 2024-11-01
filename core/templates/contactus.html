@@ -3,27 +3,38 @@
 {% block content %}
 
 {% include 'navbar.html' %}
+{% if messages %}
+<div class="container mt-3">
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+</div>
+{% endif %}
 <div class="container my-5">
     <h2>Get in Touch</h2>
     <p>If you have any questions or need help, please fill out the form below. We do our best to respond within 1 business day.</p>
     <div class="row mt-2">
         <div class="col-md-8">
             <form>
+                {% csrf_token %}
                 <div class="mb-3">
                     <label for="fullName" class="form-label">Full Name</label>
-                    <input type="text" class="form-control" id="fullName" placeholder="Enter your full name...">
+                    <input type="text" name="full_name" class="form-control" id="fullName" placeholder="Enter your full name...">
                 </div>
                 <div class="mb-3">
                     <label for="email" class="form-label">Email address</label>
-                    <input type="email" class="form-control" id="email" placeholder="Enter your email address...">
+                    <input type="email" name="email" class="form-control" id="email" placeholder="Enter your email address...">
                 </div>
                 <div class="mb-3">
                     <label for="subject" class="form-label">Subject</label>
-                    <input type="text" class="form-control" id="subject" placeholder="Enter a subject...">
+                    <input type="text" name="subject" class="form-control" id="subject" placeholder="Enter a subject...">
                 </div>
                 <div class="mb-3">
                     <label for="category" class="form-label">Category</label>
-                    <select class="form-select" id="category">
+                    <select class="form-select" id="category" name="category">
                         <option selected>Select a category...</option>
                         <option value="1">General Inquiry</option>
                         <option value="2">Support</option>
@@ -32,8 +43,8 @@
                 </div>
                 <div class="mb-3">
                     <label for="message" class="form-label">Message</label>
-                    <textarea class="form-control" id="message" rows="5" placeholder="Enter your message..."></textarea>
-                    <div class="form-text">Message has to be minimum 40 characters.</div>
+                    <textarea name="message" class="form-control" id="message" rows="5" placeholder="Enter your message..."></textarea>
+                    <div class="form-text">Message has to be minimum 4 characters.</div>
                 </div>
                 <button type="submit" class="btn btn-dark">Send Message</button>
             </form>

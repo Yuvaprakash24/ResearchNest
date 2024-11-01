@@ -130,3 +130,21 @@ class testimonial(models.Model):
     client_name = models.CharField(max_length=40)
     client_occupation = models.CharField(max_length=45)
     client_story = models.TextField()
+
+
+class Contact(models.Model):
+    CATEGORY_CHOICES = [
+        ('general', 'General Inquiry'),
+        ('support', 'Support'),
+        ('feedback', 'Feedback'),
+    ]
+
+    full_name = models.CharField(max_length=100)
+    email = models.EmailField()
+    subject = models.CharField(max_length=150)
+    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES)
+    message = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.full_name} - {self.subject}"

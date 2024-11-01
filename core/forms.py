@@ -1,5 +1,5 @@
 from django import forms
-from .models import User,Todo
+from .models import User,Todo,Contact
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 
 class SignUpForm(UserCreationForm):
@@ -40,3 +40,8 @@ class TodoForm(forms.ModelForm):
     class Meta:
         model = Todo
         exclude = ['user']
+
+class ContactForm(forms.ModelForm):
+    class Meta:
+        model = Contact
+        fields = ['full_name', 'email', 'subject', 'category', 'message', 'created_at']
