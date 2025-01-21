@@ -1,5 +1,5 @@
 {% load static %}
-<nav class="navbar navbar-dark bg-dark sticky-top">
+<nav class="navbar navbar-dark sticky-top bg-dark">
   <div class="container-fluid d-flex justify-content-between align-items-center">
     <a class="navbar-brand" href="{% url 'home' %}">
       <img src="{% static 'imgs/logo/2ch.png' %}" width="150%" alt="">
@@ -27,11 +27,11 @@
 
   <!-- Offcanvas for smaller screens -->
   <div class="offcanvas offcanvas-end text-bg-dark" tabindex="-1" id="offcanvasDarkNavbar" aria-labelledby="offcanvasDarkNavbarLabel">
-    <div class="offcanvas-header">
+    <div class="offcanvas-header bg-dark">
       <img src="{% static 'imgs/logo/2ch.png' %}">
       <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
     </div>
-    <div class="offcanvas-body">
+    <div class="offcanvas-body bg-dark">
       <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
         <div class="nav-item d-md-none">
           <form class="d-flex" role="search" method="GET" action="{% url 'search' %}">
@@ -45,6 +45,9 @@
         </li>
         <li class="nav-item">
           <a class="nav-link" href="{% url 'tags' %}">Tags</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'category_page' %}">Categories</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="{% url 'createproject' %}">Create Project</a>

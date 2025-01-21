@@ -73,12 +73,14 @@ class ProjectFile(models.Model):
         ext = os.path.splitext(self.original_filename.lower())[1]
         if ext in {'.jpg', '.jpeg', '.png', '.gif', '.bmp', '.svg', '.webp'}:
             return 'image'
-        elif ext in {'.pdf', '.doc', '.docx'}:
+        elif ext in {'.pdf', '.doc', '.docx', '.ppt', '.pptx', '.odt'}:
             return 'document'
         elif ext in {'.xlsx', '.xls', '.csv', '.ods'}:
             return 'spreadsheet'
         elif ext in {'.txt', '.md', '.rtf'}:
             return 'text'
+        elif ext in {'.py', '.java', '.c', '.cpp', '.js', '.html', '.css', '.ts', '.php', '.sh', '.go', '.rb'}:
+            return 'programming'
         return 'other'
 
     def save(self, *args, **kwargs):

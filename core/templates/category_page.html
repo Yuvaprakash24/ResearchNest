@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+{% include 'navbar.html' %}
+<div class="container my-5">
+    <h1 class="text-center mb-4">File Categories</h1>
+    <div class="mb-4">
+        <label for="category-select" class="form-label">Select a Category:</label>
+        <select id="category-select" class="form-select">
+            <option value="All" {% if selected_category == 'All' %}selected{% endif %}>All</option>
+            {% for category in categories %}
+                <option value="{{ category }}" {% if selected_category == category %}selected{% endif %}>
+                    {{ category }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="row">
+        {% for file in files %}
+            <div class="col-md-4">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ file.original_filename }}</h5>
+                        <p class="card-text">Type: {{ file.file_type }} <br> Project: {{ file.project.project_name }}</p>
+                        <a href="{{ file.get_file_url }}" target="_blank" class="btn btn-primary">View File</a>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="container d-flex justify-content-center align-items-center">
+                <div class="col-12 text-center">
+                    <img src="https://cdn.iconscout.com/icon/free/png-256/free-donnees-introuvables-1965034-1662569.png" alt="No Files" class="img-fluid">
+                    <p class="text-muted fw-bolder fs-4">No files available in this category.</p>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+    document.getElementById('category-select').addEventListener('change', function() {
+        const selectedCategory = this.value;
+        const url = new URL(window.location.href);
+        url.searchParams.set('category', selectedCategory);
+        window.location.href = url.toString();
+    });
+</script>
+{% include 'simplefooter.html' %}
+{% endblock %}

@@ -2,7 +2,7 @@
 {% block content %}
 {% include 'navbar.html' %}
 
-<div class="container pt-5">
+<div class="container pt-5 pb-3">
     <h2 class="mb-4">Search Results</h2>
     <h5 class="text-muted mb-4">Results for "<strong>{{ query }}</strong>":</h5>
 
@@ -52,10 +52,15 @@
             {% endfor %}
         </div>
     {% else %}
-        <div class="alert alert-warning" role="alert">
-            No results found for your search. Please try a different keyword.
-        </div>
+            <div class="container d-flex justify-content-center align-items-center">
+                <div class="col-12 text-center">
+                    <img src="https://cdn.iconscout.com/icon/free/png-256/free-donnees-introuvables-1965034-1662569.png" alt="No Files" class="img-fluid">
+                    <div class="alert alert-warning" role="alert">
+                    <span class="text-muted fs-4">No results found for your search. Please try a different keyword.</span>
+                    </div>
+                </div>
+            </div>
     {% endif %}
 </div>
-
+{% include 'simplefooter.html' %}
 {% endblock %}

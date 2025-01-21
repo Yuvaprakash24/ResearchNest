@@ -29,4 +29,5 @@ urlpatterns = [
     path('tags/filter', views.filter_tags, name='filter_tags'),
     path('search/', views.search_view, name='search'),
     path('howcreateproject/', views.howcreateproject, name='howcreateproject'),
+    path('categories/', views.category_page, name='category_page'),
 ]

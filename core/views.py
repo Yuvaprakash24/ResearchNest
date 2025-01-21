@@ -697,3 +697,28 @@ def handle_file_upload(file, project):
         return True, None
     except Exception as e:
         return False, str(e)
+    
+
+def category_page(request):
+    categories = {
+        'Images': ['image'],
+        'Documents': ['document'],
+        'Spreadsheets': ['spreadsheet'],
+        'Text Files': ['text'],
+        'Programming Files': ['programming'],
+        'Others': ['other'],
+    }
+
+    selected_category = request.GET.get('category', 'All')  # Get category from the query string
+    if selected_category == 'All':
+        files = models.ProjectFile.objects.all()
+    else:
+        file_types = categories.get(selected_category, [])
+        files = models.ProjectFile.objects.filter(file_type__in=file_types)
+
+    context = {
+        'categories': categories.keys(),
+        'files': files,
+        'selected_category': selected_category,
+    }
+    return render(request, 'category_page.html', context)
