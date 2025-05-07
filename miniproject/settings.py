@@ -101,8 +101,8 @@ DATABASES = {
         'NAME': 'defaultdb',
         'USER': 'avnadmin',
         'PASSWORD': os.getenv('DB_PASSWORD'),
-        'HOST': 'travellerwebsitedb-travellerwebsitedb.i.aivencloud.com',
-        'PORT': '27311'
+        'HOST': 'onlinedb-ag1a1220-a790.d.aivencloud.com',
+        'PORT': '16910'
     }
 }
 
